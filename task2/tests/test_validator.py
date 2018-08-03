@@ -1,6 +1,6 @@
 import pytest
 
-from brackets.brackets_sequence import is_valid_string
+from brackets.validator import is_valid_string
 
 """
 Tests for bracket_sequence
