@@ -1,3 +1,5 @@
+import pytest
+
 from task2.brackets_sequence import is_valid_string
 
 """
@@ -41,6 +43,30 @@ def test_invalid_examples_from_the_task():
     assert not is_valid_string("{)")
     assert not is_valid_string("{)(}")
 
-def test_invalid_examples_from_the_task():
-    assert not is_valid_string("{)")
-    assert not is_valid_string("{)(}")
+
+def test_invalid_with_correct_amount():
+    assert not is_valid_string("[(])")
+    assert not is_valid_string("[({}])")
+
+
+def test_long_string_with_pattern():
+    input_string = "{()[]}" * 10000
+    assert is_valid_string(input_string)
+
+
+def test_long_string_with_enclosing():
+    input_string = "(" + "{()[]}" * 10000 + ")"
+    assert is_valid_string(input_string)
+
+
+def test_deep_nested():
+    input_string = "({[" * 10000 + "{}" * 2000 + "]})" * 10000
+    assert is_valid_string(input_string)
+
+
+def test_incorrect_symbols():
+    with pytest.raises(Exception):
+        is_valid_string("a")
+
+    with pytest.raises(Exception):
+        is_valid_string("(b)")
