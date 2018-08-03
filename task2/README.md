@@ -3,6 +3,9 @@ Implementation of the function to check if the input string is a valid brackets 
 
 See brackets/validator.py
 
+Developed and tested for Python 3.6.
+
+
 ## Structure of the directory
 
     task2
@@ -22,10 +25,10 @@ Example:
 ```
 # assuming current directory is "task2"
 
-$ python brackets/brackets_sequence.py "[()]"
+$ python3 brackets/brackets_sequence.py "[()]"
 True
 
-$ python brackets/brackets_sequence.py "{[()]"
+$ python3 brackets/brackets_sequence.py "{[()]"
 True
 
 ```
@@ -51,7 +54,16 @@ I wrote some tests for
 
 The tests cover all the branches and lines (see htmlcov/index.html after `run_tests.sh`)
 
-If that would be reliability-critical code we could try to:
+It would be good to 
+* test the code in other environments - especially in the environment where it will be running
+* set up automated tests on CI/CD
+* test for othe python versions
+* wrap in a python module.
+
+I assume it is unnecessary for the test task.
+
+
+If the reliability would be critical we could:
 
 * build a generator for correct strings up to a certain length and validate the code on that strings. Also validate the code on the rest of possible brackets strings (=incorrect strings) up to a certain length. 
 That would give us more confidence about input of short strings. 
