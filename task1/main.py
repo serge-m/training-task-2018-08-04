@@ -6,6 +6,9 @@
 
 
 import operator
+
+import click
+
 from data_loader import load_data_to_dictionary
 from sqlalchemy import create_engine
 
@@ -92,10 +95,12 @@ def insert_if_not_exists(connection, measurement, table, columns, id_column):
 
 
 def insert(connection, measurement, table, columns):
-    connection.execute("INSERT INTO '{table}' {columns} values {values}".format(
+    values_placeholder = ','.join(['?'] * len(columns))
+    connection.execute("INSERT INTO '{table}' {columns} values ({values_placeholder})".format(
         table=table,
         columns=columns,
-        values=select_columns(measurement, columns)))
+        values_placeholder=values_placeholder),
+        select_columns(measurement, columns))
 
 
 def insert_data(data, engine, column_names, limit=None):
@@ -117,21 +122,20 @@ def insert_data(data, engine, column_names, limit=None):
             insert(connection, measurement, 'measurements', cols_measurement)
 
 
-def test_missing_data():
-    engine = create_engine('sqlite:///:memory:', echo=False)
-    insert_data(data, engine, column_names, 1000)
 
-
-def main():
+@click.command()
+@click.option('--connection-string', default="sqlite:///output.sqlite", help='Connection string for output database')
+@click.option('--limit', help='number of rows to limit the insertion', type=int, default=None)
+@click.option('--verbose', type=bool, default=False)
+def main(connection_string, limit, verbose):
     data_and_meta = load_data_to_dictionary()
 
     data, meta = data_and_meta['data'], data_and_meta['meta']
     assert all(type(x) == list for x in data)
 
     column_names = list(map(operator.itemgetter('name'), meta['view']['columns']))
-    engine = create_engine('sqlite:///local_db2.sqlite', echo=False)
-    # engine = create_engine('postgres://postgres:postgres@localhost:5432/postgres', echo=False)
-    insert_data(data, engine, column_names, 1000)
+    engine = create_engine(connection_string, echo=verbose)
+    insert_data(data, engine, column_names, limit)
 
 
 if __name__ == '__main__':
