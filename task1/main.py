@@ -11,6 +11,9 @@ import click
 
 from data_loader import load_data_to_dictionary
 from sqlalchemy import create_engine
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def reset_tables(engine):
@@ -113,21 +116,31 @@ def insert_data(data, engine, column_names, limit=None):
     cols_county = ("CountyFips", "CountyName", "StateFips", "StateName")
     cols_unit = ("Unit", "UnitName")
 
+    count = 0
     for row in data[:limit]:
-        with engine.begin() as connection:
-            measurement = dict(zip(column_names, row))
-            insert_if_not_exists(connection, measurement, 'measures', cols_measure, 'MeasureId')
-            insert_if_not_exists(connection, measurement, 'counties', cols_county, 'CountyFips')
-            insert_if_not_exists(connection, measurement, 'units', cols_unit, 'Unit')
-            insert(connection, measurement, 'measurements', cols_measurement)
+        try:
+            with engine.begin() as connection:
+                measurement = dict(zip(column_names, row))
+                insert_if_not_exists(connection, measurement, 'measures', cols_measure, 'MeasureId')
+                insert_if_not_exists(connection, measurement, 'counties', cols_county, 'CountyFips')
+                insert_if_not_exists(connection, measurement, 'units', cols_unit, 'Unit')
+                insert(connection, measurement, 'measurements', cols_measurement)
 
-
+            count += 1
+        except Exception as e:
+            logger.warning("failed to load row {} into the database. Error: {}".format(row, e))
+    return count
 
 @click.command()
 @click.option('--connection-string', default="sqlite:///output.sqlite", help='Connection string for output database')
 @click.option('--limit', help='number of rows to limit the insertion', type=int, default=None)
 @click.option('--verbose', type=bool, default=False)
 def main(connection_string, limit, verbose):
+    logging.basicConfig(level=logging.DEBUG,
+                        format="%(asctime)s|%(name)-20.20s|%(levelname)-5.5s|%(message)s")
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+
+
     data_and_meta = load_data_to_dictionary()
 
     data, meta = data_and_meta['data'], data_and_meta['meta']
@@ -135,8 +148,8 @@ def main(connection_string, limit, verbose):
 
     column_names = list(map(operator.itemgetter('name'), meta['view']['columns']))
     engine = create_engine(connection_string, echo=verbose)
-    insert_data(data, engine, column_names, limit)
-
+    num_written = insert_data(data, engine, column_names, limit)
+    print("Output is written to database: {}. Number of data points inserted: {}.".format(connection_string, num_written))
 
 if __name__ == '__main__':
     main()
