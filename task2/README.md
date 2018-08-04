@@ -25,11 +25,11 @@ Example:
 ```
 # assuming current directory is "task2"
 
-$ python3 brackets/brackets_sequence.py "[()]"
+$ python3 brackets/validator.py "[()]"
 True
 
-$ python3 brackets/brackets_sequence.py "{[()]"
-True
+$ python3 brackets/validator.py "{[()]"
+False
 
 ```
 
