@@ -6,7 +6,7 @@
 #include <cctype>
 #include <vector>
 #include <sstream>
-#include <boost/lexical_cast.hpp>
+
 
 using namespace std;
 
@@ -104,7 +104,7 @@ struct ExpressionProcessor
     
     for (auto token : tokens) {
         if (token.type == Token::number) {
-            vals.push_back(boost::lexical_cast<int>(token.s));
+            vals.push_back(atoi(token.s.c_str()));
             continue;
         }
         
