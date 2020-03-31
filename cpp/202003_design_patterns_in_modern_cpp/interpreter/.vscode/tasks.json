@@ -1,0 +1,73 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "cmake-clean-debug",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}"
+            },
+            "command": "rm -rf ${workspaceRoot}/build-debug",
+            "problemMatcher": []
+        },
+        {
+            "label": "cmake-clean-release",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}"
+            },
+            "command": "rm -rf ${workspaceRoot}/build-release",
+            "problemMatcher": []
+        },
+        {
+            "label": "cmake-debug",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}"
+            },
+            "command": "mkdir -p ${workspaceRoot}/build-debug && cd ${workspaceRoot}/build-debug && cmake -DCMAKE_BUILD_TYPE=Debug ..",
+            "problemMatcher": []
+        },
+        {
+            "label": "cmake-release",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}"
+            },
+            "command": "mkdir -p ${workspaceRoot}/build-release && cd ${workspaceRoot}/build-release && cmake -DCMAKE_BUILD_TYPE=Release ..",
+            "problemMatcher": []
+        },
+        {
+            "label": "make-debug",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/build-debug"
+            },
+            "command": "make",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": [ "cmake-debug"]
+        },
+        {
+            "label": "make-release",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/build-release"
+            },
+            "command": "make",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": [ "cmake-release"]
+        }
+    ]
+}
