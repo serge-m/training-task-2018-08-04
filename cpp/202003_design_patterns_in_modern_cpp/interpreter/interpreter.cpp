@@ -104,7 +104,7 @@ struct ExpressionProcessor
     
     for (auto token : tokens) {
         if (token.type == Token::number) {
-            vals.push_back(atoi(token.s.c_str()));
+            vals.push_back(stoi(token.s));
             continue;
         }
         
