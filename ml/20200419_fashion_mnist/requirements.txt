@@ -1,0 +1,14 @@
+ipython==7.13.0
+matplotlib==3.2.1
+numpy==1.18.2
+pandas==1.0.3
+Pillow==7.1.1
+pytorch-lightning==0.7.3
+scipy==1.4.1
+six==1.14.0
+tensorboard==2.2.1
+tensorboardX==2.0
+torch==1.4.0
+torchvision==0.5.0
+tqdm==4.45.0
+dataclasses==0.7.0
