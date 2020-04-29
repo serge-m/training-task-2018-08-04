@@ -1,6 +1,7 @@
 # Report
 
-##Software
+## Software
+
 Code of the experiments can be found here: 
 https://github.com/serge-m/code-training/tree/master/ml/20200419_fashion_mnist
 
