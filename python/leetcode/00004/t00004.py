@@ -15,23 +15,13 @@ class Target:
 class Solution:
     def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> float:
         sum_len = len(nums1) + len(nums2)
-        return find(nums1, nums2, Target(sum_len // 2, (sum_len + 1) % 2))
+        return find(nums1, nums2, Target((sum_len - 1) // 2, (sum_len - 1) % 2))
 
 
 def index(lst, target: Target):
     if target.residual == 0:
         return lst[target.idx]
     return (lst[target.idx] + lst[target.idx + 1]) / 2
-
-
-"""
-0 -> None
-1 -> 0
-2 -> 0, 1
-3 -> 1
-4 -> 1, 2
-5 -> 2 
-"""
 
 
 def find(a: List, b: List, target: Target):
@@ -55,6 +45,9 @@ def find(a: List, b: List, target: Target):
             if target.idx < pos:
                 return index(b, target)
             return index(b, target.with_shift_idx(-1))
+
+    if len(a) < 3 and len(b) < 3:
+        return index(sorted(a + b), target)
 
     # len(a) and len(b) are at least 2:
     """
@@ -91,10 +84,36 @@ def test_find_complex_3():
     assert 5 == find([1, 3, 5], [4, 6, 8, 9], Target(3, 0))
     assert 5 == find([4, 6, 8, 9], [1, 3, 5], Target(3, 0))
 
-def test_find_complex_4():
-    assert 4 == find([1, 3, 5], [4, 6, 8, 9], Target(2, 0))
-    assert 4 == find([4, 6, 8, 9], [1, 3, 5], Target(2, 0))
 
+def test_find_complex_4():
+    a, b = [1, 3, 5], [4, 6, 8, 9]
+    comb = sorted(a + b)
+
+    for i in range(len(comb)):
+        assert comb[i] == find(a, b, Target(i, 0))
+        assert comb[i] == find(b, a, Target(i, 0))
+
+    for i in range(1, len(comb)):
+        assert (comb[i - 1] + comb[i]) / 2 == find(a, b, Target(i-1, 1))
+        assert (comb[i - 1] + comb[i]) / 2 == find(b, a, Target(i - 1, 1))
+
+
+def test_find_complex_5():
+    a, b = [1, 3, 5, 7, 9, 11], [4, 6, 8, 9]
+    comb = sorted(a + b)
+
+    for i in range(len(comb)):
+        assert comb[i] == find(a, b, Target(i, 0))
+        assert comb[i] == find(b, a, Target(i, 0))
+
+    for i in range(1, len(comb)):
+        assert (comb[i - 1] + comb[i]) / 2 == find(a, b, Target(i-1, 1))
+        assert (comb[i - 1] + comb[i]) / 2 == find(b, a, Target(i - 1, 1))
+
+
+def test_2by2():
+    a, b = [1, 2], [3, 4]
+    assert Solution().findMedianSortedArrays(a, b) == 2.5
 
 def test_find_1():
     assert 2.5 == find([], [2, 3], Target(0, 1))
