@@ -3,6 +3,8 @@ import random
 from dataclasses import dataclass, field
 from time import time
 from typing import List, Any
+import queue
+
 
 import numpy as np
 
@@ -15,17 +17,19 @@ class ListNode:
 
 class Solution:
     def mergeKLists(self, lists: List[ListNode]) -> ListNode:
+        lists = lists[:]
         list_maker = ListMaker()
         pq = PriorityQueue()
         for i in range(len(lists)):
             if lists[i] is not None:
-                pq.push(lists[i].val, lists[i])
+                pq.push(lists[i].val, i)
+                lists[i] = lists[i].next
         while not pq.empty():
-            cur_node: ListNode = pq.pop()
-            list_maker.add(cur_node.val)
-            nxt: ListNode = cur_node.next
-            if nxt is not None:
-                pq.push(nxt.val, nxt)
+            val, i = pq.pop()
+            list_maker.add(val)
+            if lists[i] is not None:
+                pq.push(lists[i].val, i)
+                lists[i] = lists[i].next
         return list_maker.build()
 
 
@@ -34,22 +38,15 @@ class ListMaker:
         self._init()
 
     def _init(self):
-        self.head = ListNode()
-        self.tail = ListNode(next=self.head)
+        self.head = self.tail = ListNode(0)
 
     def add(self, value):
+        self.tail.next = ListNode(value)
         self.tail = self.tail.next
-        self.tail.val = value
-        self.tail.next = ListNode()
         return self
 
     def build(self):
-        if self.tail.next is self.head:
-            return None
-        self.tail.next = None
-        result = self.head
-        self._init()
-        return result
+        return self.head.next
 
 
 @dataclass(order=True)
@@ -60,16 +57,16 @@ class PQItem:
 
 class PriorityQueue:
     def __init__(self):
-        self._pq = []
+        self._pq = queue.PriorityQueue()
 
-    def push(self, priority, value):
-        heapq.heappush(self._pq, PQItem(priority, value))
+    def push(self, priority, index):
+        self._pq.put((priority, index))
 
     def empty(self) -> bool:
-        return not self._pq
+        return self._pq.empty()
 
     def pop(self):
-        return heapq.heappop(self._pq).entry
+        return self._pq.get()
 
 
 ###################################
