@@ -17,7 +17,6 @@ class ListNode:
 
 class Solution:
     def mergeKLists(self, lists: List[ListNode]) -> ListNode:
-        lists = lists[:]
         list_maker = ListMaker()
         pq = PriorityQueue()
         for i in range(len(lists)):
@@ -108,9 +107,10 @@ def test_solution_speed():
         for _ in range(100)
     ]
 
-    lists = [build_list(arr) for arr in arrays]
+
     times = []
     for i in range(10):
+        lists = [build_list(arr) for arr in arrays]
         t = time()
         res = Solution().mergeKLists(lists)
         times.append(time() - t)
