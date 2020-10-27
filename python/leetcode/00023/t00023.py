@@ -15,18 +15,18 @@ class ListNode:
 
 class Solution:
     def mergeKLists(self, lists: List[ListNode]) -> ListNode:
-        list_maker = ListMaker()
+        res = []
         pq = PriorityQueue()
         for i in range(len(lists)):
             if lists[i] is not None:
                 pq.push(lists[i].val, lists[i])
         while not pq.empty():
             cur_node: ListNode = pq.pop()
-            list_maker.add(cur_node.val)
+            res.append(cur_node.val)
             nxt: ListNode = cur_node.next
             if nxt is not None:
                 pq.push(nxt.val, nxt)
-        return list_maker.build()
+        return build_list(res)
 
 
 class ListMaker:
@@ -72,14 +72,15 @@ class PriorityQueue:
         return heapq.heappop(self._pq).entry
 
 
-###################################
-
-
 def build_list(lst: List[int]):
     node = None
     for val in lst[::-1]:
         node = ListNode(val, node)
     return node
+
+###################################
+
+
 
 
 def recover_list(lst: ListNode):
