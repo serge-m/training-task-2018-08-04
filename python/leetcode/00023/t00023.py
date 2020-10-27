@@ -56,16 +56,16 @@ class PQItem:
 
 class PriorityQueue:
     def __init__(self):
-        self._pq = queue.PriorityQueue()
+        self._pq = []
 
     def push(self, priority, index):
-        self._pq.put((priority, index))
+        heapq.heappush(self._pq, (priority, index))
 
     def empty(self) -> bool:
-        return self._pq.empty()
+        return not self._pq
 
     def pop(self):
-        return self._pq.get()
+        return heapq.heappop(self._pq)
 
 
 ###################################
