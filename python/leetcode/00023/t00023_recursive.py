@@ -12,21 +12,22 @@ def iter_list(lst: ListNode):
         lst = lst.next
 
 
-def merge(list1, list2):
-    lm = ListMaker()
-    if list2 is not None:
-        while list1 is not None:
-            if list2.val < list1.val:
-                list1, list2 = list2, list1
-            lm.add(list1.val)
-            list1 = list1.next
-
-    for value in iter_list(list1):
-        lm.add(value)
-    for value in iter_list(list2):
-        lm.add(value)
-
-    return lm.build()
+def merge2Lists(l1, l2):
+    head = point = ListNode(0)
+    while l1 and l2:
+        if l1.val <= l2.val:
+            point.next = l1
+            l1 = l1.next
+        else:
+            point.next = l2
+            l2 = l1
+            l1 = point.next.next
+        point = point.next
+    if not l1:
+        point.next = l2
+    else:
+        point.next = l1
+    return head.next
 
 
 class Solution:
@@ -36,27 +37,12 @@ class Solution:
 
         while len(lists) > 1:
             new_lists = [
-                merge(lists[i], lists[i + 1]) for i in range(0, len(lists) - 1, 2)
+                merge2Lists(lists[i], lists[i + 1]) for i in range(0, len(lists) - 1, 2)
             ]
             if len(lists) % 2 == 1:
                 new_lists.append(lists[-1])
             lists = new_lists
         return lists[0]
 
-
-class ListMaker:
-    def __init__(self):
-        self._init()
-
-    def _init(self):
-        self.head = self.tail = ListNode(0)
-
-    def add(self, value):
-        self.tail.next = ListNode(value)
-        self.tail = self.tail.next
-        return self
-
-    def build(self):
-        return self.head.next
 
 ###################################
