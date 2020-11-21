@@ -1,3 +1,4 @@
+import copy
 from typing import List, Tuple
 import numpy as np
 
@@ -27,18 +28,15 @@ class Solution:
         ]
 
 
-def next_pos(pos: Tuple[int, int]) -> Tuple[int, int]:
-    if pos[1] == 8:
-        return pos[0] + 1, 0
-    return pos[0], pos[1] + 1
-
-
 def line_ok(b, row_idx):
     return sorted(b[row_idx]) == all_9
 
 
 def columns_ok(b):
-    return True
+    return all(
+        sorted(b[:, i]) == all_9
+        for i in range(9)
+    )
 
 
 def square_ok(square):
@@ -52,10 +50,6 @@ def squares_ok(b, row_idx):
 
 def step_right(pos):
     return pos[0], pos[1] + 1
-
-
-def lock_action(action, pos):
-    pass
 
 
 def get_actions(b, pos):
@@ -103,7 +97,7 @@ def search(b, pos):
 
 
 def test_default():
-    board = [
+    board0 = [
         ["5", "3", ".", ".", "7", ".", ".", ".", "."],
         ["6", ".", ".", "1", "9", "5", ".", ".", "."],
         [".", "9", "8", ".", ".", ".", ".", "6", "."],
@@ -126,9 +120,14 @@ def test_default():
         ["3", "4", "5", "2", "8", "6", "1", "7", "9"]]
 
     sol = Solution()
-    sol.solveSudoku(board)
 
+    board = copy.deepcopy(board0)
+    sol.solveSudoku(board)
     assert board == expected
+
+    board = copy.deepcopy(board0)[::-1]
+    sol.solveSudoku(board)
+    assert board == expected[::-1]
 
 
 def test_get_actions():
