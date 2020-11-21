@@ -29,15 +29,9 @@ class Solution:
                 for i in range(0, 9, 3)
             ]
         )
-        num_avail_per_row = [(len(in_row), row) for row, in_row in enumerate(available.in_rows)]
-        num_avail_per_row = sorted(num_avail_per_row)
-        row_to_next = {}
-        for i in range(len(num_avail_per_row)):
-            try:
-                row_to_next[num_avail_per_row[i][1]] = num_avail_per_row[i+1][1]
-            except IndexError:
-                row_to_next[num_avail_per_row[i][1]] = 9
-        search(b, (num_avail_per_row[0][1], 0), available, row_to_next)
+        busiest_row, row_to_next = _transition_from_busiest([len(i) for i in available.in_rows])
+        busiest_col, col_to_next = _transition_from_busiest([len(i) for i in available.in_cols])
+        search(b, (busiest_row, busiest_col), available, row_to_next, busiest_col, col_to_next)
 
         board[:] = [
             [
@@ -46,6 +40,19 @@ class Solution:
             ]
             for row in b
         ]
+
+
+def _transition_from_busiest(counts_available):
+    num_avail_per_row = [(num_avail, row) for row, num_avail in enumerate(counts_available)]
+    num_avail_per_row = sorted(num_avail_per_row)
+    row_to_next = {}
+    for i in range(len(num_avail_per_row)):
+        try:
+            row_to_next[num_avail_per_row[i][1]] = num_avail_per_row[i + 1][1]
+        except IndexError:
+            row_to_next[num_avail_per_row[i][1]] = 9
+    busiest = num_avail_per_row[0][1]
+    return busiest, row_to_next
 
 
 class Available:
@@ -91,23 +98,23 @@ def state_minus(state, value):
     return in_rows.difference(value), in_cols.difference(value), in_sq.difference(value)
 
 
-def search(b, pos: Tuple[int, int], available, row_to_next):
+def search(b, pos: Tuple[int, int], available, row_to_next, busiest_col, col_to_next):
     if pos[1] == 9:
-        pos = (row_to_next[pos[0]], 0)
+        pos = (row_to_next[pos[0]], busiest_col)
 
     if pos[0] == 9:
         return True
 
-    nxt = pos[0], pos[1] + 1
+    nxt = pos[0], col_to_next[pos[1]]
     if b[pos] != empty:
-        return search(b, nxt, available, row_to_next)
+        return search(b, nxt, available, row_to_next, busiest_col, col_to_next)
 
     old_state = available.get_state(pos)
     actions = available_from_state(old_state)
     for action in actions:
         b[pos] = action
         available.set_state(pos, state_minus(old_state, action))
-        if search(b, nxt, available, row_to_next):
+        if search(b, nxt, available, row_to_next, busiest_col, col_to_next):
             return True
 
     b[pos] = empty
