@@ -3,10 +3,6 @@ from typing import List
 
 class Solution:
     def firstMissingPositive(self, nums: List[int]) -> int:
-        min_positive = min((x for x in nums if x > 0), default=0)
-        if min_positive != 1:
-            return 1
-
         sort1(nums)
         for i in range(len(nums)):
             if nums[i] != i + 1:
@@ -15,15 +11,15 @@ class Solution:
         return len(nums) + 1
 
 
-def sort1(nums, ):
+def sort1(nums):
     for i in range(len(nums)):
         while True:
             pos_for_cur = nums[i] - 1
-            if pos_for_cur == i:
+            if pos_for_cur == i:  # the number is on it's place
                 break
-            if pos_for_cur < 0 or pos_for_cur >= len(nums):
+            if pos_for_cur < 0 or pos_for_cur >= len(nums):  # the number is out of range, no need to sort
                 break
-            if nums[i] == nums[pos_for_cur]:
+            if nums[i] == nums[pos_for_cur]:  # it's a duplicate, skip
                 break
             nums[i], nums[pos_for_cur] = nums[pos_for_cur], nums[i]
 
