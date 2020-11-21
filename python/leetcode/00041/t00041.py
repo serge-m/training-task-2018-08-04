@@ -4,12 +4,12 @@ from typing import List
 class Solution:
     def firstMissingPositive(self, nums: List[int]) -> int:
         N = 300
-        first_N = list(range(N + 1))
+        used = {}
         for x in nums:
             if 0 < x <= N:
-                first_N[x] = 0
-        for i in first_N:
-            if i != 0:
+                used[x] = 1
+        for i in range(1, N + 1):
+            if i not in used:
                 return i
         return -1
 
