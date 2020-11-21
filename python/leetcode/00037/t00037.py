@@ -40,32 +40,38 @@ class Solution:
         ]
 
 
-def or_default(x, default):
-    return x if x is not None else default
-
-
 class Available:
     def __init__(self, in_cols, in_rows, in_sq):
-        self.in_cols = or_default(in_cols, [set(all_9) for i in range(9)])
-        self.in_rows = or_default(in_rows, [set(all_9) for i in range(9)])
-        self.in_sq = or_default(in_sq, [[set(all_9) for i in range(3)] for j in range(3)])
+        self.in_cols = in_cols
+        self.in_rows = in_rows
+        self.in_sq = in_sq
+
+    def get_state(self, pos):
+        old_in_rows = self.in_rows[pos[0]]
+        old_in_cols = self.in_cols[pos[1]]
+        old_in_sq = self.in_sq[pos[0] // 3][pos[1] // 3]
+        return old_in_rows, old_in_cols, old_in_sq
+
+    def set_state(self, pos, state):
+        in_rows, in_cols, in_sq = state
+        self.in_rows[pos[0]] = in_rows
+        self.in_cols[pos[1]] = in_cols
+        self.in_sq[pos[0] // 3][pos[1] // 3] = in_sq
+
+
+def available_from_state(state):
+    in_rows, in_cols, in_sq = state
+    return in_rows.intersection(in_cols).intersection(in_sq)
+
+
+def state_minus(state, value):
+    value = {value}
+    in_rows, in_cols, in_sq = state
+    return in_rows.difference(value), in_cols.difference(value), in_sq.difference(value)
 
 
 def step_right(pos):
     return pos[0], pos[1] + 1
-
-
-def actions_square(b, pos):
-    sq_y, sq_x = (pos[0] // 3) * 3, (pos[1] // 3) * 3
-    return set(b[sq_y:sq_y + 3, sq_x:sq_x + 3].ravel())
-
-
-def actions_row(b, pos):
-    return set(b[pos[0]])
-
-
-def actions_col(b, pos):
-    return set(b[:, pos[1]])
 
 
 def search(b, pos: Tuple[int, int], available):
@@ -79,22 +85,16 @@ def search(b, pos: Tuple[int, int], available):
     if b[pos] != empty:
         return search(b, nxt, available)
 
-    old_in_rows = available.in_rows[pos[0]]
-    old_in_cols = available.in_cols[pos[1]]
-    old_in_sq = available.in_sq[pos[0] // 3][pos[1] // 3]
-    actions = old_in_rows.intersection(old_in_cols).intersection(old_in_sq)
+    old_state = available.get_state(pos)
+    actions = available_from_state(old_state)
     for action in actions:
         b[pos] = action
-        available.in_rows[pos[0]] = old_in_rows - {action}
-        available.in_cols[pos[1]] = old_in_cols - {action}
-        available.in_sq[pos[0] // 3][pos[1] // 3] = old_in_sq - {action}
+        available.set_state(pos, state_minus(old_state, action))
         if search(b, nxt, available):
             return True
 
     b[pos] = empty
-    available.in_rows[pos[0]] = old_in_rows
-    available.in_cols[pos[1]] = old_in_cols
-    available.in_sq[pos[0] // 3][pos[1] // 3] = old_in_sq
+    available.set_state(pos, old_state)
 
     return False
 
@@ -137,19 +137,3 @@ def test_default():
     elapsed = time() - start
     print(elapsed)
     assert board == expected[::-1]
-
-
-def test_get_actions():
-    b = np.array([
-        [5, 3, 4, 2, 7, 0, 0, 0, 0],
-        [6, 0, 0, 1, 9, 5, 0, 0, 0],
-        [0, 9, 8, 0, 0, 0, 0, 6, 0],
-        [8, 0, 0, 0, 6, 0, 0, 0, 3],
-        [4, 0, 0, 8, 0, 3, 0, 0, 1],
-        [7, 0, 0, 0, 2, 0, 0, 0, 6],
-        [0, 6, 0, 0, 0, 0, 2, 8, 0],
-        [0, 0, 0, 4, 1, 9, 0, 0, 5],
-        [0, 0, 0, 0, 8, 0, 0, 7, 9]])
-
-    pos = (0, 5)
-    assert set(all_9) - actions_col(b, pos) - actions_row(b, pos) - actions_square(b, pos) == {6, 8}
