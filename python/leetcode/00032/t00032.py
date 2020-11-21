@@ -1,25 +1,28 @@
+from dataclasses import dataclass
+
+
 class Solution:
     def longestValidParentheses(self, s: str) -> int:
-        all_counts = []
-        stack = []
-        cnt = 0
+        stack = [StackItem('^', 0)]
+
         for c in s:
             if c == '(':
-                stack.append(c)
-            elif c == ')':
-                if not stack:
-                    all_counts.append(cnt)
-                    cnt = 0
+                stack.append(StackItem(c, 0))
+            else:  # c == ')'
+                last: StackItem = stack[-1]
+                if last.char == '(':
+                    stack.pop()
+                    stack[-1].cnt += last.cnt + 2
                 else:
-                    prev = stack.pop()
-                    if prev == '(':
-                        cnt += 2
-                    else:
-                        raise ValueError("unexpected value")
-            else:
-                raise ValueError("bad character")
-        all_counts.append(cnt)
-        return max(all_counts, default=0)
+                    stack.append(StackItem(c, 0))
+
+        return max((i.cnt for i in stack), default=0)
+
+
+@dataclass
+class StackItem:
+    char: str
+    cnt: int
 
 
 def test_1():
@@ -37,37 +40,13 @@ def test_2():
 def test_3():
     s = Solution()
     assert s.longestValidParentheses("()())()") == 4
+    assert s.longestValidParentheses("(()(())") == 6
+    assert s.longestValidParentheses("(()((())") == 4
+    assert s.longestValidParentheses("(())(())") == 8
+    assert s.longestValidParentheses("(()))(())") == 4
+    assert s.longestValidParentheses("(())((())") == 4
 
 
-"""
-0
-(
-
- 0
-((
-
-1
-(
-
-
-
-()())()
-
-0
-(
-
-2
-
-
-2
-(
-
-4
-_
-
-40
-x
-
-4
-(
-"""
+def test_4():
+    s = Solution()
+    assert s.longestValidParentheses(")()())()()(") == 4
