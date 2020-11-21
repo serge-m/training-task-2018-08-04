@@ -1,71 +1,94 @@
-from functools import lru_cache
-from typing import List
+import copy
 from collections import defaultdict, Counter
+from typing import List
 
 
 class Solution:
     def findSubstring(self, s: str, words: List[str]) -> List[int]:
-        word_len = len(words[0])
+        len_word = len(words[0])
+        return sum(
+            [
+                [
+                    found + start
+                    for found in find(s[start:], words)
+                ]
+                for start in range(0, len_word)
+            ],
+            []
+        )
 
-        mem = defaultdict(list)
-        words_multiset = Counter(words)
-        for word in words:
-            hasher = Hasher()
-            for c in word:
-                hasher.add(c)
-            mem[hasher.hash_value].append(word)
 
-        hasher = Hasher()
-        hashes = []
-        for idx, c in enumerate(s):
-            hasher.add(c)
-            if idx >= word_len:
-                hasher.subtract(s[idx - word_len])
-            hashes.append(hasher.hash_value)
-            # print(ord(c), hasher.hash_value, bin(ord(c)), bin(hasher.hash_value))
+class Matcher:
+    def __init__(self, id_counts):
+        self.id_counts = id_counts
+        self.current_counts = defaultdict(int)
 
-        def find(words_used, idx):
-            if words_used == words_multiset:
-                return True
-            if idx >= len(s):
-                return False
+    def add(self, word_id):
+        self.current_counts[word_id] += 1
 
-            for word in mem.get(hashes[idx], ()):
-                if words_used[word] < words_multiset[word]:
-                    if word != s[1 + idx - word_len:1 + idx]:
-                        # print("oops")
-                        pass
-                    else:
-                        if find(words_used + Counter([word]), idx + word_len):
-                            return True
+    def remove(self, word_id):
+        self.current_counts[word_id] -= 1
 
+    def full(self):
+        if sum(self.current_counts.values()) != sum(self.id_counts.values()):
             return False
 
-        results = []
-        for idx in range(word_len - 1, len(s)):
-            if find(Counter(), idx):
-                results.append(idx - word_len + 1)
-        return results
+        for word_id, cnt in self.id_counts.items():
+            if self.current_counts[word_id] != cnt:
+                return False
+
+        return True
 
 
-class Hasher:
-    def __init__(self):
-        self._h = 0
+def find(s: str, words: List[str]):
+    len_word = len(words[0])
+    word_to_id, id_counts = build_word_counts(words)
 
-    def add(self, c):
-        self._h = self._h ^ (ord(c) * 97)
-        return self
+    translated = [
+        word_to_id.get(s[pos: pos + len_word], -1)
+        for pos in range(0, len(s), len_word)
+    ]
 
-    def subtract(self, c):
-        return self.add(c)
+    matcher = Matcher(id_counts)
 
-    @property
-    def hash_value(self):
-        return self._h
+    result = []
+    for pos in range(len(translated)):
+        matcher.add(translated[pos])
+        pos_to_remove = pos - len(words)
+        if pos_to_remove >= 0:
+            matcher.remove(translated[pos_to_remove])
+        if matcher.full():
+            result.append((pos - len(words) + 1) * len_word)
+
+    return result
 
 
-def hash(s: str):
-    pass
+def build_word_counts(words):
+    word_to_id = {}
+    id_counts = {}
+    word_count = {}
+    for word_id, word in enumerate(words):
+        if word not in word_to_id:
+            word_to_id[word] = word_id
+            word_count[word] = 1
+            id_counts[word_id] = 1
+        else:
+            word_count[word] += 1
+            id_counts[word_to_id[word]] += 1
+
+    return word_to_id, id_counts
+
+
+def test_find():
+    assert find("b.a.a.a.b.a.a.b.a.", ["a.", "a.", "b.", "b."]) == [8]
+
+
+def test_counter():
+    s = Counter(['a', 'b', 'a'])
+    s.subtract('a')
+    assert s == Counter(['a', 'b'])
+    s.subtract('a')
+    assert s == Counter({'b': 1, 'a': 0})
 
 
 def test_1():
