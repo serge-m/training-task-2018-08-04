@@ -29,7 +29,15 @@ class Solution:
                 for i in range(0, 9, 3)
             ]
         )
-        search(b, (0, 0), available)
+        num_avail_per_row = [(len(in_row), row) for row, in_row in enumerate(available.in_rows)]
+        num_avail_per_row = sorted(num_avail_per_row)
+        row_to_next = {}
+        for i in range(len(num_avail_per_row)):
+            try:
+                row_to_next[num_avail_per_row[i][1]] = num_avail_per_row[i+1][1]
+            except IndexError:
+                row_to_next[num_avail_per_row[i][1]] = 9
+        search(b, (num_avail_per_row[0][1], 0), available, row_to_next)
 
         board[:] = [
             [
@@ -88,23 +96,23 @@ def step_right(pos):
     return pos[0], pos[1] + 1
 
 
-def search(b, pos: Tuple[int, int], available):
+def search(b, pos: Tuple[int, int], available, row_to_next):
     if pos[1] == 9:
-        pos = (pos[0] + 1, 0)
+        pos = (row_to_next[pos[0]], 0)
 
     if pos[0] == 9:
         return True
 
     nxt = step_right(pos)
     if b[pos] != empty:
-        return search(b, nxt, available)
+        return search(b, nxt, available, row_to_next)
 
     old_state = available.get_state(pos)
     actions = available_from_state(old_state)
     for action in actions:
         b[pos] = action
         available.set_state(pos, state_minus(old_state, action))
-        if search(b, nxt, available):
+        if search(b, nxt, available, row_to_next):
             return True
 
     b[pos] = empty
