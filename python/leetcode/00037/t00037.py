@@ -66,12 +66,11 @@ def get_actions(b, pos):
     return actions
 
 
-def search(b, pos):
-    y, x = pos
-    if y == 9:
+def search(b, pos: Tuple[int, int]):
+    if pos[1] == 9:
+        pos = (pos[0] + 1, 0)
+    if pos[0] == 9:
         return True
-    if x == 9:
-        return search(b, (y + 1, 0))
 
     nxt = step_right(pos)
     if b[pos] != empty:
