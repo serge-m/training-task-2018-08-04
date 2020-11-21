@@ -18,7 +18,18 @@ class Solution:
 
         b = np.array([[int(x) if x != '.' else empty for x in row] for row in board], dtype='int')
 
-        search(b, (0, 0))
+        available = Available(
+            in_cols=[set(all_9) - set(b[:, i]) for i in range(9)],
+            in_rows=[set(all_9) - set(b[i, :]) for i in range(9)],
+            in_sq=[
+                [
+                    set(all_9) - set(b[i:i + 3, j:j + 3].ravel())
+                    for j in range(0, 9, 3)
+                ]
+                for i in range(0, 9, 3)
+            ]
+        )
+        search(b, (0, 0), available)
 
         board[:] = [
             [
@@ -29,60 +40,62 @@ class Solution:
         ]
 
 
-def line_ok(b, row_idx):
-    return sorted(b[row_idx]) == all_9
+def or_default(x, default):
+    return x if x is not None else default
 
 
-def columns_ok(b):
-    return all(
-        sorted(b[:, i]) == all_9
-        for i in range(9)
-    )
-
-
-def square_ok(square):
-    return sorted(square.ravel()) == all_9
-
-
-def squares_ok(b, row_idx):
-    rows = b[row_idx: row_idx + 3]
-    return square_ok(rows[:, 0:3]) and square_ok(rows[:, 3:6]) and square_ok(rows[:, 6:9])
+class Available:
+    def __init__(self, in_cols, in_rows, in_sq):
+        self.in_cols = or_default(in_cols, [set(all_9) for i in range(9)])
+        self.in_rows = or_default(in_rows, [set(all_9) for i in range(9)])
+        self.in_sq = or_default(in_sq, [[set(all_9) for i in range(3)] for j in range(3)])
 
 
 def step_right(pos):
     return pos[0], pos[1] + 1
 
 
-def get_actions(b, pos):
-    actions = set(range(1, 10))
-    for x in b[pos[0]]:
-        actions.discard(x)
-    for x in b[:, pos[1]]:
-        actions.discard(x)
+def actions_square(b, pos):
     sq_y, sq_x = (pos[0] // 3) * 3, (pos[1] // 3) * 3
-    for x in b[sq_y:sq_y + 3, sq_x:sq_x + 3].ravel():
-        actions.discard(x)
-
-    return actions
+    return set(b[sq_y:sq_y + 3, sq_x:sq_x + 3].ravel())
 
 
-def search(b, pos: Tuple[int, int]):
+def actions_row(b, pos):
+    return set(b[pos[0]])
+
+
+def actions_col(b, pos):
+    return set(b[:, pos[1]])
+
+
+def search(b, pos: Tuple[int, int], available):
     if pos[1] == 9:
         pos = (pos[0] + 1, 0)
+
     if pos[0] == 9:
         return True
 
     nxt = step_right(pos)
     if b[pos] != empty:
-        return search(b, nxt)
+        return search(b, nxt, available)
 
-    actions = get_actions(b, pos)
+    old_in_rows = available.in_rows[pos[0]]
+    old_in_cols = available.in_cols[pos[1]]
+    old_in_sq = available.in_sq[pos[0] // 3][pos[1] // 3]
+    actions = old_in_rows.intersection(old_in_cols).intersection(old_in_sq)
     for action in actions:
         b[pos] = action
-        if search(b, nxt):
+        available.in_rows[pos[0]] = old_in_rows - {action}
+        available.in_cols[pos[1]] = old_in_cols - {action}
+        available.in_sq[pos[0] // 3][pos[1] // 3] = old_in_sq - {action}
+        if search(b, nxt, available):
             return True
 
     b[pos] = empty
+    available.in_rows[pos[0]] = old_in_rows
+    available.in_cols[pos[1]] = old_in_cols
+    available.in_sq[pos[0] // 3][pos[1] // 3] = old_in_sq
+
     return False
 
 
@@ -138,4 +151,5 @@ def test_get_actions():
         [0, 0, 0, 4, 1, 9, 0, 0, 5],
         [0, 0, 0, 0, 8, 0, 0, 7, 9]])
 
-    assert get_actions(b, (0, 5)) == {6, 8}
+    pos = (0, 5)
+    assert set(all_9) - actions_col(b, pos) - actions_row(b, pos) - actions_square(b, pos) == {6, 8}
