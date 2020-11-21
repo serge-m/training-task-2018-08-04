@@ -1,18 +1,17 @@
-import copy
-from collections import defaultdict, Counter
+from collections import defaultdict
 from typing import List, Dict
 
 
 class Solution:
     def findSubstring(self, s: str, words: List[str]) -> List[int]:
-        len_word = len(words[0])
+        word_converter = WordConverter(words)
         return sum(
             (
                 [
                     found + start
-                    for found in find(s[start:], words)
+                    for found in find(s[start:], word_converter)
                 ]
-                for start in range(0, len_word)
+                for start in range(word_converter.len_word)
             ),
             []
         )
@@ -25,6 +24,7 @@ class Matcher:
     Sliding window is represented as `add` and `remove` operations that have to be applied
     by the user as the window moves along the sequence.
     """
+
     def __init__(self, target_counts: Dict[int, int]):
         self.target_counts = target_counts
         self.target_sum = sum(self.target_counts.values())
@@ -50,22 +50,29 @@ class Matcher:
         return True
 
 
-def find(s: str, words: List[str]):
-    cnt_words = len(words)
-    len_word = len(words[0])  # assuming all the words are of the same length
-    word_to_id, id_counts = build_word_counts(words)  # can be extracted to a caller.
+class WordConverter:
+    def __init__(self, words: List[str]):
+        assert len(words) != 0
+        self.len_word = len(words[0])  # assuming all the words are of the same length
+        self.word_to_id, self.id_counts = build_word_counts(words)
+        self.cnt_words = len(words)
 
+
+def find(s: str, word_converter: WordConverter):
     sequence = [
-        word_to_id.get(s[pos: pos + len_word], -1)
-        for pos in range(0, len(s), len_word)
+        word_converter.word_to_id.get(s[pos: pos + word_converter.len_word], -1)
+        for pos in range(0, len(s), word_converter.len_word)
     ]
 
-    found = match_int_sequence(sequence, id_counts, cnt_words)
+    found = match_int_sequence(sequence, word_converter.id_counts, word_converter.cnt_words)
 
-    return [pos * len_word for pos in found]
+    return [pos * word_converter.len_word for pos in found]
 
 
-def match_int_sequence(sequence, target_counts, cnt_words):
+def match_int_sequence(sequence: List[int], target_counts: Dict[int, int], cnt_words: int):
+    """
+    assertion: cnt_words == sum(target_counts.values())
+    """
     matcher = Matcher(target_counts)
 
     result = []
@@ -94,7 +101,7 @@ def build_word_counts(words):
 
 
 def test_find():
-    assert find("b.a.a.a.b.a.a.b.a.", ["a.", "a.", "b.", "b."]) == [8]
+    assert find("b.a.a.a.b.a.a.b.a.", WordConverter(["a.", "a.", "b.", "b."])) == [8]
 
 
 def test_1():
