@@ -82,18 +82,13 @@ class Available:
 
 
 def available_from_state(state):
-    in_rows, in_cols, in_sq = state
-    return in_rows.intersection(in_cols).intersection(in_sq)
+    return state[0].intersection(state[1]).intersection(state[2])
 
 
 def state_minus(state, value):
     value = {value}
     in_rows, in_cols, in_sq = state
     return in_rows.difference(value), in_cols.difference(value), in_sq.difference(value)
-
-
-def step_right(pos):
-    return pos[0], pos[1] + 1
 
 
 def search(b, pos: Tuple[int, int], available, row_to_next):
@@ -103,7 +98,7 @@ def search(b, pos: Tuple[int, int], available, row_to_next):
     if pos[0] == 9:
         return True
 
-    nxt = step_right(pos)
+    nxt = pos[0], pos[1] + 1
     if b[pos] != empty:
         return search(b, nxt, available, row_to_next)
 
