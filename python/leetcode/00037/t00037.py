@@ -18,12 +18,12 @@ class Solution:
 
         b = np.array([[int(x) if x != '.' else empty for x in row] for row in board], dtype='int')
 
-        available = Available(
-            in_cols=[set(all_9) - set(b[:, i]) for i in range(9)],
-            in_rows=[set(all_9) - set(b[i, :]) for i in range(9)],
-            in_sq=[
+        available = Available.from_busy(
+            cols=[b[:, i] for i in range(9)],
+            rows=[b[i, :] for i in range(9)],
+            sq=[
                 [
-                    set(all_9) - set(b[i:i + 3, j:j + 3].ravel())
+                    b[i:i + 3, j:j + 3].ravel()
                     for j in range(0, 9, 3)
                 ]
                 for i in range(0, 9, 3)
@@ -45,6 +45,20 @@ class Available:
         self.in_cols = in_cols
         self.in_rows = in_rows
         self.in_sq = in_sq
+
+    @staticmethod
+    def from_busy(cols, rows, sq):
+        return Available(
+            in_cols=[set(all_9) - set(col) for col in cols],
+            in_rows=[set(all_9) - set(row) for row in rows],
+            in_sq=[
+                [
+                    set(all_9) - set(sq[i][j])
+                    for j in range(0, 3)
+                ]
+                for i in range(0, 3)
+            ]
+        )
 
     def get_state(self, pos):
         old_in_rows = self.in_rows[pos[0]]
@@ -137,3 +151,13 @@ def test_default():
     elapsed = time() - start
     print(elapsed)
     assert board == expected[::-1]
+
+
+def test_profiling():
+    import cProfile
+
+    with cProfile.Profile() as pr:
+        for i in range(100):
+            test_default()
+
+    pr.print_stats()
