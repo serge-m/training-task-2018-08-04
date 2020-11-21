@@ -1,5 +1,6 @@
 from typing import List
 
+
 class Solution:
     def firstMissingPositive(self, nums: List[int]) -> int:
         min_positive = min((x for x in nums if x > 0), default=0)
@@ -16,18 +17,15 @@ class Solution:
 
 def sort1(nums, ):
     for i in range(len(nums)):
-        while nums[i] != i + 1:
-            if nums[i] <= 0 or nums[i] >= len(nums):
-                break
+        while True:
             pos_for_cur = nums[i] - 1
-            assert pos_for_cur >= 0
-            if pos_for_cur >= len(nums):
-                return
+            if pos_for_cur == i:
+                break
+            if pos_for_cur < 0 or pos_for_cur >= len(nums):
+                break
             if nums[i] == nums[pos_for_cur]:
-                nums[i] = -1
                 break
             nums[i], nums[pos_for_cur] = nums[pos_for_cur], nums[i]
-
 
 
 def test_2():
