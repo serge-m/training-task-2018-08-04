@@ -1,28 +1,21 @@
-from dataclasses import dataclass
-
-
 class Solution:
     def longestValidParentheses(self, s: str) -> int:
-        stack = [StackItem('^', 0)]
+        stack = [['^', 0]]  # stack contains tuples (char, count)
+        len_longest = 0
 
         for c in s:
             if c == '(':
-                stack.append(StackItem(c, 0))
+                stack.append([c, 0])
             else:  # c == ')'
-                last: StackItem = stack[-1]
-                if last.char == '(':
+                last = stack[-1]
+                if last[0] == '(':
                     stack.pop()
-                    stack[-1].cnt += last.cnt + 2
+                    stack[-1][1] += last[1] + 2
+                    len_longest = max(len_longest, stack[-1][1])
                 else:
-                    stack.append(StackItem(c, 0))
+                    stack.append([c, 0])
 
-        return max((i.cnt for i in stack), default=0)
-
-
-@dataclass
-class StackItem:
-    char: str
-    cnt: int
+        return len_longest
 
 
 def test_1():
