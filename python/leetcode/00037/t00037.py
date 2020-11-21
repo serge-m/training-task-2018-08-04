@@ -1,4 +1,5 @@
 import copy
+from time import time
 from typing import List, Tuple
 import numpy as np
 
@@ -55,15 +56,12 @@ def step_right(pos):
 def get_actions(b, pos):
     actions = set(range(1, 10))
     for x in b[pos[0]]:
-        if x != 0:
-            actions.discard(x)
+        actions.discard(x)
     for x in b[:, pos[1]]:
-        if x != 0:
-            actions.discard(x)
+        actions.discard(x)
     sq_y, sq_x = (pos[0] // 3) * 3, (pos[1] // 3) * 3
     for x in b[sq_y:sq_y + 3, sq_x:sq_x + 3].ravel():
-        if x != 0:
-            actions.discard(x)
+        actions.discard(x)
 
     return actions
 
@@ -71,28 +69,21 @@ def get_actions(b, pos):
 def search(b, pos):
     y, x = pos
     if y == 9:
-        return columns_ok(b)
+        return True
     if x == 9:
-        if not line_ok(b, y):
-            return False
         return search(b, (y + 1, 0))
-    if y in (2, 5, 8) and x in (3, 6, 9):
-        if not square_ok(b[y - 2:y + 1, x - 3:x]):
-            return False
 
     nxt = step_right(pos)
     if b[pos] != empty:
         return search(b, nxt)
 
-    old = b[pos]
     actions = get_actions(b, pos)
     for action in actions:
         b[pos] = action
-
         if search(b, nxt):
             return True
 
-    b[pos] = old
+    b[pos] = empty
     return False
 
 
@@ -122,11 +113,17 @@ def test_default():
     sol = Solution()
 
     board = copy.deepcopy(board0)
+    start = time()
     sol.solveSudoku(board)
+    elapsed = time() - start
+    print(elapsed)
     assert board == expected
 
     board = copy.deepcopy(board0)[::-1]
+    start = time()
     sol.solveSudoku(board)
+    elapsed = time() - start
+    print(elapsed)
     assert board == expected[::-1]
 
 
