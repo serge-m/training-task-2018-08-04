@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.12)
-project(MD5Encrypter)
+project(tst_conan)
 
-add_definitions("-std=c++11")
+set(CMAKE_CXX_STANDARD 17)
 
 if (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
     include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
@@ -10,6 +10,17 @@ else ()
     message(WARNING "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first")
 endif ()
 
+enable_testing()
 
-add_executable(md5 main.cpp)
-target_link_libraries(md5 ${CONAN_LIBS})
+
+# Initial example with poco dependency
+add_subdirectory(app_with_external_dependency)
+
+# example of a library with tests and a client app
+add_subdirectory(lib)
+
+add_executable(app app/app.cpp)
+target_link_libraries(app func_lib)
+target_include_directories(app PRIVATE ${CMAKE_SOURCE_DIR}/lib)
+
+add_subdirectory(tests)
