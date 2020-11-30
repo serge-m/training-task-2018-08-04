@@ -1,3 +1,7 @@
+"""
+Better solution is implemented in C++
+
+"""
 from typing import List
 from dataclasses import dataclass
 from bisect import bisect_left
@@ -94,7 +98,7 @@ def test_find_complex_4():
         assert comb[i] == find(b, a, Target(i, 0))
 
     for i in range(1, len(comb)):
-        assert (comb[i - 1] + comb[i]) / 2 == find(a, b, Target(i-1, 1))
+        assert (comb[i - 1] + comb[i]) / 2 == find(a, b, Target(i - 1, 1))
         assert (comb[i - 1] + comb[i]) / 2 == find(b, a, Target(i - 1, 1))
 
 
@@ -107,13 +111,14 @@ def test_find_complex_5():
         assert comb[i] == find(b, a, Target(i, 0))
 
     for i in range(1, len(comb)):
-        assert (comb[i - 1] + comb[i]) / 2 == find(a, b, Target(i-1, 1))
+        assert (comb[i - 1] + comb[i]) / 2 == find(a, b, Target(i - 1, 1))
         assert (comb[i - 1] + comb[i]) / 2 == find(b, a, Target(i - 1, 1))
 
 
 def test_2by2():
     a, b = [1, 2], [3, 4]
     assert Solution().findMedianSortedArrays(a, b) == 2.5
+
 
 def test_find_1():
     assert 2.5 == find([], [2, 3], Target(0, 1))
