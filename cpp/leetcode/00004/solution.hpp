@@ -68,7 +68,7 @@ public:
                 vector<int> rest;
                 copy_at_most_2(a, mid_a_idx, rest);
                 copy_at_most_2(b, mid_b_idx, rest);
-                std::partial_sort(rest.begin(), rest.begin() + 2, rest.end());
+                std::partial_sort(rest.begin(), rest.begin() + std::min<size_t>(rest.size(), 2), rest.end());
                 return std::accumulate(rest.begin(), rest.begin() + target.len(), 0.) / target.len();
             } else {
                 return findMedian(a, b, range_a.with_start(mid_a_idx), target);
@@ -80,7 +80,7 @@ public:
 
     void copy_at_most_2(const vector<int> &source, size_t start, vector<int> &dest) const {
         for(size_t i = 0; i < 2 && start + i < source.size(); ++i)
-            dest.push_back(source[start + i]);
+            dest.push_back(source.at(start + i));
     }
 };
 

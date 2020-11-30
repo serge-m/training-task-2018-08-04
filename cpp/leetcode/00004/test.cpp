@@ -4,6 +4,13 @@
 
 
 
+TEST_CASE("corner_case") {
+    Solution sol = Solution();
+    REQUIRE(sol.findMedianSortedArrays(vector<int>{}, vector<int>{1}) == 1);
+    REQUIRE(sol.findMedianSortedArrays(vector<int>{}, vector<int>{1,2,3}) == 2);
+}
+
+
 TEST_CASE("out_of_three") {
     Solution sol = Solution();
     REQUIRE(sol.findMedianSortedArrays(vector<int>{1,2,3}, vector<int>{}) == 2);
