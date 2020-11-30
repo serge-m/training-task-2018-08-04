@@ -7,7 +7,7 @@
 
 int main() {
     Solution sol{};
-    if (0) {
+    if (1) {
         auto res = sol.findMedianSortedArrays(
                 vector<int>{10, 20, 30, 40, 50, 60},
                 vector<int>{5, 15, 100}
@@ -15,7 +15,7 @@ int main() {
 
         std::cout << "res " << res << "\n";
     }
-    if (0) {
+    if (1) {
         auto res = sol.findMedianSortedArrays(
                 vector<int>{10, 20, 30, 40, 50, 60},
                 vector<int>{5, 15, 25}
@@ -23,7 +23,7 @@ int main() {
 
         std::cout << "res " << res << "\n";
     }
-    if (0) {
+    if (1) {
         auto res = sol.findMedianSortedArrays(
                 vector<int>{1, 1, 1, 10},
                 vector<int>{2, 2, 3}
@@ -31,7 +31,7 @@ int main() {
 
         std::cout << "res " << res << "\n";
     }
-    if (0) {
+    if (1) {
         auto res = sol.findMedianSortedArrays(
                 vector<int>{1, 1, 1, 10},
                 vector<int>{0, 0, 0}
@@ -40,9 +40,6 @@ int main() {
         std::cout << "res " << res << "\n";
     }
     if (1) {
-        vector<int> rest{3,2, 0};
-
-
         Solution sol = Solution();
         REQUIRE(sol.findMedianSortedArrays(vector<int>{1, 3}, vector<int>{2}) == 2);
     }

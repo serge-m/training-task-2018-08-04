@@ -4,6 +4,7 @@
 #include <exception>
 #include <iostream>
 #include <iterator>
+#include <numeric>
 
 using std::vector;
 
@@ -17,6 +18,10 @@ struct Range {
 
     Range with_end(size_t end) const {
         return Range{this->start, end};
+    }
+
+    size_t len() const {
+        return end - start;
     }
 };
 
@@ -42,20 +47,21 @@ void print_mid(vector<int> r, int32_t mid_idx) {
 class Solution {
 public:
     double findMedianSortedArrays(const vector<int> &nums1, const vector<int> &nums2) {
-        double target_idx = double(nums1.size() + nums2.size() - 1) / 2.;
-        return findMedian(nums1, nums2, Range{0, nums1.size() + 1}, target_idx);
+        auto total_len = nums1.size() + nums2.size();
+        Range target{(total_len - 1) / 2, total_len / 2 + 1 };
+        return findMedian(nums1, nums2, Range{0, nums1.size() + 1}, target);
     }
 
 public:
-    double findMedian(const vector<int>& a, const vector<int>& b, Range range_a, double target_idx) {
+    double findMedian(const vector<int>& a, const vector<int>& b, Range range_a, const Range& target) {
         int32_t mid_a_idx = mid(range_a);
-        int32_t mid_b_idx = int32_t(target_idx) - mid_a_idx;
+        int32_t mid_b_idx = target.start - mid_a_idx;
 
         if (mid_b_idx < 0) {
-            return findMedian(a, b, range_a.with_end(mid_a_idx), target_idx);
+            return findMedian(a, b, range_a.with_end(mid_a_idx), target);
         }
         if (mid_b_idx > b.size()) {
-            return findMedian(a, b, range_a.with_start(mid_a_idx), target_idx);
+            return findMedian(a, b, range_a.with_start(mid_a_idx), target);
         }
         if (mid_a_idx == 0 || mid_b_idx == b.size() || a[mid_a_idx-1] <= b[mid_b_idx]) {
             if (mid_b_idx == 0 || mid_a_idx == a.size() || b[mid_b_idx-1] <= a[mid_a_idx]) {
@@ -63,15 +69,12 @@ public:
                 copy_at_most_2(a, mid_a_idx, rest);
                 copy_at_most_2(b, mid_b_idx, rest);
                 std::partial_sort(rest.begin(), rest.begin() + 2, rest.end());
-                if (target_idx - trunc(target_idx) > 0.2) {
-                    return (rest[0] + rest[1] ) / 2.;
-                }
-                return rest[0];
+                return std::accumulate(rest.begin(), rest.begin() + target.len(), 0.) / target.len();
             } else {
-                return findMedian(a, b, range_a.with_start(mid_a_idx), target_idx);
+                return findMedian(a, b, range_a.with_start(mid_a_idx), target);
             }
         } else {
-            return findMedian(a, b, range_a.with_end(mid_a_idx), target_idx);
+            return findMedian(a, b, range_a.with_end(mid_a_idx), target);
         }
     }
 
