@@ -4,7 +4,7 @@
 
 
 
-TEST_CASE("test1_short") {
+TEST_CASE("out_of_three") {
     Solution sol = Solution();
     REQUIRE(sol.findMedianSortedArrays(vector<int>{1,2,3}, vector<int>{}) == 2);
     REQUIRE(sol.findMedianSortedArrays(vector<int>{1,2}, vector<int>{3}) == 2);
@@ -17,7 +17,7 @@ TEST_CASE("test1_short") {
 }
 
 
-TEST_CASE("test1_medium") {
+TEST_CASE("out_of_seven") {
     Solution sol = Solution();
     REQUIRE(sol.findMedianSortedArrays(vector<int>{1,2,3,4,5,6,7}, vector<int>{}) == 4);
     REQUIRE(sol.findMedianSortedArrays(vector<int>{2,3,4,5,6,7}, vector<int>{1}) == 4);
@@ -32,15 +32,17 @@ TEST_CASE("test1_medium") {
 
 
 
-TEST_CASE("test2_") {
+TEST_CASE("simple_odd") {
     Solution sol = Solution();
-    REQUIRE(sol.findMedianSortedArrays(vector<int>{1,2,3,4,5,6,7}, vector<int>{}) == 4);
     REQUIRE(sol.findMedianSortedArrays(vector<int>{1,2,3,4,5,6,7}, vector<int>{8}) == 4.5);
-    REQUIRE(sol.findMedianSortedArrays(vector<int>{3,4,4,4}, vector<int>{1,2, 7}) == 4);
 }
 
-TEST_CASE("test2_complex") {
+TEST_CASE("real_search") {
     Solution sol = Solution();
+    REQUIRE(sol.findMedianSortedArrays(
+            vector<int>{   3,4,4,4 },
+            vector<int>{1,2,       7})
+            == 4);
     REQUIRE(sol.findMedianSortedArrays(
             vector<int>{    3,4,5,  7},
             vector<int>{1,2,      6,  8}
@@ -51,7 +53,7 @@ TEST_CASE("test2_complex") {
     ) == 4.5);
 }
 
-TEST_CASE("test3_complex") {
+TEST_CASE("real_search_with_odd_result") {
     Solution sol = Solution();
     REQUIRE(sol.findMedianSortedArrays(
             vector<int>{    3,  5,  7},
@@ -65,11 +67,14 @@ TEST_CASE("test3_complex") {
 }
 
 
-TEST_CASE("test4_my") {
+TEST_CASE("more_search") {
     Solution sol{};
     REQUIRE(sol.findMedianSortedArrays(
-            vector<int>{10,20,30,40,50,60},
-            vector<int>{5,15,100}
+            vector<int>{  10,   20,30,40,50,60},
+            vector<int>{5,   15,               100}
             ) == 30);
-
+    REQUIRE(sol.findMedianSortedArrays(
+            vector<int>{5,   15,               100},
+            vector<int>{  10,   20,30,40,50,60}
+    ) == 30);
 }
