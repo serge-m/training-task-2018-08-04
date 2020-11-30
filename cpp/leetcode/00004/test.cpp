@@ -63,3 +63,13 @@ TEST_CASE("test3_complex") {
             vector<int>{4,4,  4,5,6,7,  1231238}
     ) == 4.5);
 }
+
+
+TEST_CASE("test4_my") {
+    Solution sol{};
+    REQUIRE(sol.findMedianSortedArrays(
+            vector<int>{10,20,30,40,50,60},
+            vector<int>{5,15,100}
+            ) == 30);
+
+}

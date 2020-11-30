@@ -1,7 +1,10 @@
-add_executable(t00004 test.cpp)
-find_package(Catch2 REQUIRED)
-set_target_properties(t00004 PROPERTIES LINKER_LANGUAGE CXX)
+add_executable(t00004 launcher.cpp)
 target_compile_features(t00004 PUBLIC cxx_std_17)
-target_link_libraries(t00004 Catch2::Catch2)
 
-add_test(NAME test_t00004 COMMAND t00004 -r junit)
+
+add_executable(t00004_test test.cpp)
+find_package(Catch2 REQUIRED)
+target_compile_features(t00004_test PUBLIC cxx_std_17)
+target_link_libraries(t00004_test Catch2::Catch2)
+
+add_test(NAME t00004_test COMMAND t00004_test -r junit)
