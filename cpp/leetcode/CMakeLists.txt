@@ -16,6 +16,7 @@ target_compile_features(t00002 PUBLIC cxx_std_17)
 
 add_subdirectory(00001)
 add_subdirectory(00004)
+add_subdirectory(00010)
 
 
 
