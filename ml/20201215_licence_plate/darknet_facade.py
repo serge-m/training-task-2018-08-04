@@ -1,10 +1,15 @@
 import os
-
-os.environ['DARKNET_PATH'] = os.environ.get('DARKNET_PATH', './darknet')
-from darknet import darknet
-
-from darknet.darknet import c_int, pointer, predict_image, \
-    get_network_boxes, free_detections, do_nms_sort, remove_negatives
+import random
+try:
+    os.environ['DARKNET_PATH'] = os.environ.get('DARKNET_PATH', './darknet')
+    from darknet import darknet
+    from darknet.darknet import c_int, pointer, predict_image, \
+        get_network_boxes, free_detections, do_nms_sort, remove_negatives
+except OSError as e:
+    if 'cannot open shared object file' in str(e) and 'libdarknet.so' in str(e):
+        raise ImportError("Unable to load libdarknet. "
+                          "Check if darknet is compiled and if DARKNET_PATH is set properly") from e
+    raise
 
 
 def detect_image(network, class_names, image, thresh=.5, hier_thresh=.5, nms=.45):
@@ -23,6 +28,18 @@ def detect_image(network, class_names, image, thresh=.5, hier_thresh=.5, nms=.45
 
     free_detections(detections, num)
     return sorted(predictions, key=lambda x: x[1])
+
+
+def class_colors(names, seed=0):
+    """
+    Create a dict with one random BGR color for each
+    class name
+    """
+    rs = random.Random(seed + len(names))
+    return {name: (
+        rs.randint(0, 255),
+        rs.randint(0, 255),
+        rs.randint(0, 255)) for name in names}
 
 
 class NN:
