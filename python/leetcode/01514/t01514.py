@@ -1,36 +1,37 @@
 import heapq
 import math
 import sys
-from typing import List, Tuple
+from collections import defaultdict
+from typing import List, Dict
 
 int_inf = sys.maxsize
 
 
 class Solution:
     def maxProbability(self, n: int, edges: List[List[int]], succProb: List[float], start: int, end: int) -> float:
-        adj_list = fill_adj_list(n, edges, succProb)
-        is_visited = [False for _ in range(n)]
-        best_paths = [int_inf for _ in range(n)]
+        adj_list = fill_adj_list(edges, succProb)
+        visited = set()
+        best_paths = {u: int_inf for u in adj_list.keys()}
         q = []
         fill_initial(q, start, best_paths)
         while not empty(q):
             (dist, u) = get_min(q)
             if u == end:
                 return distance_to_proba(best_paths[u])
-            update_paths(u, adj_list, is_visited, best_paths, q)
+            update_paths(u, adj_list, visited, best_paths, q)
 
         return 0.0
 
 
-def update_paths(u, adj_list, is_visited, best_paths, q):
-    if is_visited[u]:
+def update_paths(u, adj_list, visited: set, best_paths, q):
+    if u in visited:
         return
-    for (v, dist) in adj_list[u]:
+    for (v, dist) in adj_list[u].items():
         new_dist = best_paths[u] + dist
         if new_dist < best_paths[v]:
             best_paths[v] = new_dist
             heapq.heappush(q, (new_dist, v))
-    is_visited[u] = True
+    visited.add(u)
 
 
 def get_min(q):
@@ -54,14 +55,14 @@ def fill_initial(q, start, best_paths):
     best_paths[start] = proba_to_distance(1.)
 
 
-def fill_adj_list(n, edges, succProb) -> List[List[Tuple[int, float]]]:
-    adj_list = [[] for _ in range(n)]
+def fill_adj_list(edges, succProb) -> Dict[int, Dict[int, float]]:
+    adj_list = defaultdict(defaultdict)
     for i, ((u, v), prob) in enumerate(zip(edges, succProb)):
         if prob == 0.:
             continue
         dist = proba_to_distance(prob)
-        adj_list[u].append((v, dist))
-        adj_list[v].append((u, dist))
+        adj_list[u][v] = dist
+        adj_list[v][u] = dist
     return adj_list
 
 
