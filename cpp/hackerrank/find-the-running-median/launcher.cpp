@@ -1,5 +1,7 @@
 #include <bits/stdc++.h>
 #include <set>
+#include <random>
+
 using namespace std;
 
 /*
@@ -31,8 +33,8 @@ ostream& operator<<(ostream &os, const vector<T>& a) {
 vector<double> runningMedian(vector<int> a) {
     vector<double> results;
     results.reserve(a.size());
-    std::set<double> lower;
-    std::set<double> higher;
+    std::multiset<double> lower;
+    std::multiset<double> higher;
     for(auto x : a) {
         // cout << x << ":\n" << std::flush;
         // cout << "0 lower " << lower << " higher " << higher << "\n" << std::flush;
@@ -63,21 +65,61 @@ vector<double> runningMedian(vector<int> a) {
             results.push_back(*lower.rbegin());
         }
         else {
-            // std::cout << "bad size res " << lower.size() << " " << higher.size() << "\n";
+             std::cout << "bad size res " << lower.size() << " " << higher.size() << "\n";
         }
     }
     return results;
 }
 
-int main() {
+vector<double> runningMedianBySort(vector<int> a) {
+    vector<double> results;
+    results.reserve(a.size());
+    for(size_t i = 0; i < a.size(); ++i) {
+        sort(a.begin(), a.begin() + i + 1);
 
-    vector<int> a{1,2,3,4,5,6,7};
-    vector<double> result = runningMedian(a);
-
-    cout << result << "\n";
+        size_t m = (i+1) / 2;
+        if ((i + 1) %2 == 1 ) {
+            results.push_back(a[m]);
+        }
+        else {
+            results.push_back((a[m] + a[m-1]) / 2.);
+        }
+    }
+    return results;
 }
 
-int main_()
+template<typename T>
+vector<T> random_vector(int seed, size_t size, T min, T max) {
+    std::seed_seq seed_{seed};
+    default_random_engine engine{seed_};
+    uniform_int_distribution<T> distribution{min, max};
+    vector<T> v;
+    v.reserve(size);
+    generate_n(std::back_inserter(v), size, [&distribution, &engine]() {return distribution(engine);});
+    return v;
+}
+
+int main__() {
+
+    for (int size = 7; size < 20; ++ size) {
+        auto v = random_vector(0, size, 0, size*10);
+
+        cout << size << "\n";
+        cout << v << "\n";
+        const vector<double> &ans1 = runningMedian(v);
+        const vector<double> &ans2 = runningMedianBySort(v);
+
+        if (ans1 != ans2) {
+            cout << ans2 << "\n";
+            cout << ans1 << "\n";
+            cout << "bad ! \n";
+        }
+        cout << "\n";
+    }
+    return 0;
+}
+
+int main()
 {
     ofstream fout(getenv("OUTPUT_PATH"));
 
