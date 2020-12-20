@@ -1,0 +1,10 @@
+add_executable(find_the_running_median launcher.cpp)
+target_compile_features(find_the_running_median PUBLIC cxx_std_17)
+
+find_package(Catch2 REQUIRED)
+
+add_executable(find_the_running_median_test test.cpp)
+target_compile_features(find_the_running_median_test PUBLIC cxx_std_17)
+target_link_libraries(find_the_running_median_test Catch2::Catch2)
+
+add_test(NAME find_the_running_median_test COMMAND find_the_running_median_test -r junit)
