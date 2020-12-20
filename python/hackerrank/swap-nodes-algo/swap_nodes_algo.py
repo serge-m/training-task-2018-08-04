@@ -2,12 +2,14 @@
 
 import os
 import sys
+import sys
 
 
 #
 # Complete the swapNodes function below.
 #
 def swapNodes(indexes, queries):
+    sys.setrecursionlimit(15000)
     tree = indexes
     return [list(traverse_and_swap(tree, 1, query, 1)) for query in queries]
 
