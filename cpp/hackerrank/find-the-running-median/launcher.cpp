@@ -36,15 +36,12 @@ vector<double> runningMedian(vector<int> a) {
     std::multiset<double> lower;
     std::multiset<double> higher;
     for(auto x : a) {
-        // cout << x << ":\n" << std::flush;
-        // cout << "0 lower " << lower << " higher " << higher << "\n" << std::flush;
         if (results.empty() || x <= *lower.rbegin()) {
             lower.insert(x);
         }
         else {
             higher.insert(x);
         }
-        // cout << "1 lower " << lower << " higher " << higher << "\n" << std::flush;
 
         if (lower.size() > higher.size() + 1) {
             auto it_largest = std::prev(lower.end());
@@ -56,16 +53,12 @@ vector<double> runningMedian(vector<int> a) {
             lower.insert(*it_smallest);
             higher.erase(it_smallest);
         }
-        // cout << "2 lower " << lower << " higher " << higher << "\n" << std::flush;
 
         if (lower.size() == higher.size()) {
             results.push_back((*lower.rbegin() + *higher.begin()) / 2.);
         }
         else if(lower.size() == higher.size() + 1) {
             results.push_back(*lower.rbegin());
-        }
-        else {
-             std::cout << "bad size res " << lower.size() << " " << higher.size() << "\n";
         }
     }
     return results;
