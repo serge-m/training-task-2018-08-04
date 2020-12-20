@@ -1,27 +1,32 @@
 #!/bin/python3
 
 import os
-import sys
-
-
-#
-# Complete the runningMedian function below.
-#
-def median(a):
-    m = len(a) // 2
-    if len(a) % 2 == 1:
-        return a[m]
-    else:
-        return (a[m - 1] + a[m]) / 2
+import heapq
 
 
 def runningMedian(a):
     result = []
-    cur = []
+    low = []  # heap of pairs (-x, x). highest x is on top
+    high = []  # heap of pairs (x, x). lowest x is on top
     for x in a:
-        cur.append(x)
-        cur.sort()
-        result.append(f"{median(cur):.1f}")
+        if not low or x <= low[0][1]:
+            heapq.heappush(low, (-x, x))
+        else:
+            heapq.heappush(high, (x, x))
+
+        if len(low) > len(high) + 1:
+            (_, v) = heapq.heappop(low)
+            heapq.heappush(high, (v, v))
+        elif len(high) > len(low):
+            (_, v) = heapq.heappop(high)
+            heapq.heappush(low, (-v, v))
+
+        if len(low) == len(high):
+            med = (low[0][1] + high[0][1]) / 2.
+        else:
+            med = low[0][1]
+
+        result.append(f"{med:.1f}")
 
     return result
 
