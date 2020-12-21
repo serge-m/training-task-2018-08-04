@@ -16,7 +16,7 @@ class Solution:
         if first_word[0].isdecimal():
             return 1, idx
         else:
-            return 0, words[1:]
+            return 0, words[1:], words[0]
 
 
 def test_1():
