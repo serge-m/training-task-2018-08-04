@@ -3,18 +3,17 @@ from typing import List
 
 class Solution:
     def reorderLogFiles(self, logs: List[str]) -> List[str]:
-        with_key = [
-            (self.make_key(log, idx), log) for idx, log in enumerate(logs)
-        ]
-        with_key.sort()
-        return [log for key, log in with_key]
+        return sorted(
+            logs,
+            key=self.make_key
+        )
 
     @staticmethod
-    def make_key(log, idx):
+    def make_key(log):
         words = log.split(' ')
         first_word = words[1]
         if first_word[0].isdecimal():
-            return 1, idx
+            return (1,)  # sort is stable in python. index is not needed
         else:
             return 0, words[1:], words[0]
 
