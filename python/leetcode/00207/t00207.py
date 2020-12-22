@@ -24,7 +24,7 @@ class Solution:
                 if not dfs(u, adj, visited, visited_in_cur_pass, result):
                     return False
 
-        return all(visited)
+        return True
 
 
 def dfs(u, adj, visited, visited_in_cur_pass, result):
