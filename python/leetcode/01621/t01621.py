@@ -10,6 +10,12 @@ class Solution:
 def calc(n, k):
     """
     count number of ways with a segment starting right at n-1"""
+    if k == 1:
+        if n > 0:
+            return n - 1
+        else:
+            return 0
+
     if n - 1 < k:
         return 0
     if n - 1 == k:
@@ -20,6 +26,5 @@ def calc(n, k):
         num_gap_variants = total_len
         res += num_gap_variants * calc(n - total_len, k - 1)
     return res % (10 ** 9 + 7)
-
 
 
