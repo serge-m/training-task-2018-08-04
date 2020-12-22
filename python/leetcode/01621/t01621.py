@@ -6,8 +6,16 @@ class Solution:
     def numberOfSets2(self, n: int, k: int) -> int:
         return sum([calc(i, k) for i in range(1, n + 1)], 0) % (10 ** 9 + 7)
 
-    def numberOfSets(self, n: int, k: int) -> int:
+    def numberOfSets_with_segm_stat(self, n: int, k: int) -> int:
         return calc_with_segm_stat(n - 1, k, 0)
+
+    def numberOfSets(self, n: int, k: int) -> int:
+        return calc_combinatoric(n, k)
+
+
+def calc_combinatoric(n, k):
+    from math import comb
+    return comb(n + k - 1, 2 * k) % (10 ** 9 + 7)
 
 
 @lru_cache(maxsize=None)
