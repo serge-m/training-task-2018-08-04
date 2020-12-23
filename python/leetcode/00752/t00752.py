@@ -1,5 +1,8 @@
 """
-start 1133
+752. Open the Lock
+
+t = 50
+
 """
 
 from collections import deque
@@ -12,7 +15,10 @@ class Solution:
         visited = set(map(int, deadends))
         target = int(target)
         start = 0
-        q = [(0, distance_estimation(target), target)]
+        q = []
+
+        if target not in visited:
+            q.append((0, distance_estimation(target), target))
 
         while True:
             try:
@@ -23,13 +29,10 @@ class Solution:
             if state == start:
                 return distance
 
-            visited.add(state)
-
             for nxt in neighbors(state):
                 if nxt not in visited:
+                    visited.add(nxt)
                     heapq.heappush(q, (distance + 1, distance_estimation(nxt), nxt))
-
-            print(len(q))
 
 
 
@@ -62,6 +65,7 @@ def test_ne():
         9
     ])
 
+
 def test_ne2():
     assert sorted(neighbors(1234)) == sorted([
         2234,
@@ -77,7 +81,6 @@ def test_ne2():
         1233,
 
     ])
-
 
 
 if __name__ == '__main__':
