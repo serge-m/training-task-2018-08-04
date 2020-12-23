@@ -6,7 +6,6 @@ t = 50
 """
 
 from collections import deque
-import heapq
 from typing import List
 
 
@@ -15,14 +14,14 @@ class Solution:
         visited = set(map(int, deadends))
         target = int(target)
         start = 0
-        q = []
+        q = deque()
 
         if target not in visited:
             q.append((0, target))
 
         while True:
             try:
-                (distance, state) = heapq.heappop(q)
+                (distance, state) = q.popleft()
             except IndexError:
                 return -1
 
@@ -32,7 +31,7 @@ class Solution:
             for nxt in neighbors(state):
                 if nxt not in visited:
                     visited.add(nxt)
-                    heapq.heappush(q, (distance + 1, nxt))
+                    q.append((distance + 1, nxt))
 
 
 def neighbors(state):
