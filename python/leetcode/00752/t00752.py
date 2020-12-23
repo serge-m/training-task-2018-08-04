@@ -75,3 +75,7 @@ def test_ne2():
 
 def test_solution():
     assert Solution().openLock(["0000"], "8888") == -1
+
+
+def test_solution2():
+    assert Solution().openLock([], "8888") == 2*4
