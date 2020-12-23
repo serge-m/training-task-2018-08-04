@@ -3,6 +3,8 @@ start 1133
 """
 
 from collections import deque
+from functools import lru_cache
+from typing import List
 
 
 class Solution:
