@@ -18,11 +18,11 @@ class Solution:
         q = []
 
         if target not in visited:
-            q.append((0, distance_estimation(target), target))
+            q.append((0, target))
 
         while True:
             try:
-                (distance, _, state) = heapq.heappop(q)
+                (distance, state) = heapq.heappop(q)
             except IndexError:
                 return -1
 
@@ -32,17 +32,7 @@ class Solution:
             for nxt in neighbors(state):
                 if nxt not in visited:
                     visited.add(nxt)
-                    heapq.heappush(q, (distance + 1, distance_estimation(nxt), nxt))
-
-
-
-def distance_estimation(state):
-    est = 0
-    for i in range(4):
-        m = (10 ** i)
-        d = state // m % 10
-        est += min(d, 10 - d)
-    return est
+                    heapq.heappush(q, (distance + 1, nxt))
 
 
 def neighbors(state):
@@ -83,5 +73,5 @@ def test_ne2():
     ])
 
 
-if __name__ == '__main__':
+def test_solution():
     assert Solution().openLock(["0000"], "8888") == -1
