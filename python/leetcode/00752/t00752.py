@@ -3,53 +3,82 @@ start 1133
 """
 
 from collections import deque
-from functools import lru_cache
+import heapq
 from typing import List
 
 
 class Solution:
     def openLock(self, deadends: List[str], target: str) -> int:
-        visited = set(deadends)
-        q = deque()
-        q.append(("0000", 0))
+        visited = set(map(int, deadends))
+        target = int(target)
+        start = 0
+        q = [(0, distance_estimation(target), target)]
+
         while True:
             try:
-                (state, distance) = q.popleft()
+                (distance, _, state) = heapq.heappop(q)
             except IndexError:
                 return -1
 
-            if state == target:
+            if state == start:
                 return distance
 
             visited.add(state)
 
             for nxt in neighbors(state):
                 if nxt not in visited:
-                    q.append((nxt, distance + 1))
+                    heapq.heappush(q, (distance + 1, distance_estimation(nxt), nxt))
+
+            print(len(q))
 
 
-@lru_cache(maxsize=None)
-def next_char(c):
-    ci = ord(c) - ord('0')
-    n = (ci + 1) % 10
-    return chr(n + ord('0'))
 
-
-@lru_cache(maxsize=None)
-def prev_char(c):
-    ci = ord(c) - ord('0')
-    n = (ci - 1) % 10
-    return chr(n + ord('0'))
+def distance_estimation(state):
+    est = 0
+    for i in range(4):
+        m = (10 ** i)
+        d = state // m % 10
+        est += min(d, 10 - d)
+    return est
 
 
 def neighbors(state):
-    return (
-        state[0:3] + next_char(state[3]),
-        state[0:3] + prev_char(state[3]),
-        state[0:2] + next_char(state[2]) + state[3],
-        state[0:2] + prev_char(state[2]) + state[3],
-        state[0] + next_char(state[1]) + state[2:],
-        state[0] + prev_char(state[1]) + state[2:],
-        next_char(state[0]) + state[1:],
-        prev_char(state[0]) + state[1:]
-    )
+    for i in range(4):
+        m = (10 ** i)
+        d = state // m % 10
+        yield state + (-d + (d + 1) % 10) * m
+        yield state + (-d + (d - 1) % 10) * m
+
+
+def test_ne():
+    assert sorted(neighbors(0)) == sorted([
+        1000,
+        9000,
+        100,
+        900,
+        10,
+        90,
+        1,
+        9
+    ])
+
+def test_ne2():
+    assert sorted(neighbors(1234)) == sorted([
+        2234,
+        234,
+
+        1334,
+        1134,
+
+        1244,
+        1224,
+
+        1235,
+        1233,
+
+    ])
+
+
+
+if __name__ == '__main__':
+    assert Solution().openLock(["0000"], "8888") == -1
