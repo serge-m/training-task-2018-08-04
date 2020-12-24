@@ -3,34 +3,35 @@ from functools import lru_cache
 
 class Solution:
     def isMatch(self, s: str, p: str) -> bool:
-        return match(s, p)
 
+        def is_end(st, i):
+            return i == len(st)
 
-@lru_cache(maxsize=None)
-def match(s, p):
-    if p == "":
-        if s == "":
-            return True
-        else:
-            return False
-    c = p[0]
+        @lru_cache(maxsize=None)
+        def match(si, pi):
+            # print(s[si:], p[pi:])
+            if is_end(p, pi):
+                return is_end(s, si)
 
-    if c == '?':
-        if s == "":
-            return False
-        return match(s[1:], p[1:])
+            c = p[pi]
 
-    if c == '*':
-        for i in range(0, len(s) + 1):
-            if match(s[i:], p[1:]):
-                return True
-        return False
+            if c == '?':
+                if is_end(s, si):
+                    return False
+                return match(si + 1, pi + 1)
 
-    if s == "":
-        return False
+            if c == '*':
+                for i in range(si, len(s) + 1):
+                    if match(i, pi + 1):
+                        return True
+                return False
 
-    if c != s[0]:
-        return False
+            if is_end(s, si):
+                return False
 
-    return match(s[1:], p[1:])
+            if c != s[si]:
+                return False
 
+            return match(si + 1, pi + 1)
+
+        return match(0, 0)
