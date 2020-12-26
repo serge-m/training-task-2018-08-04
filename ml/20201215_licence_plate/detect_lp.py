@@ -20,6 +20,7 @@ def parse_args(argv):
     parser.add_argument("-i", "--input-dir", help="input directory", required=True)
     parser.add_argument("-o", "--output-dir", default="output", help="output directory", required=False)
     parser.add_argument("-V", "--verbose", action='store_true', help="verbose output", required=False)
+    parser.add_argument("--visualize", action='store_true', help="generate detection visualizations", required=False)
 
     parser.add_argument("--vehicle-weights", default="data/yolov4.weights",
                         help="yolo weights path for vehicle detector")
@@ -85,7 +86,8 @@ def main(argv):
     verbose = args.verbose
     input_path = Path(args.input_dir)
     in_paths = sorted([p for p in input_path.glob("*.jpg") if p.is_file()])
-    print(in_paths)
+    if verbose:
+        print(f"found {len(in_paths)} in {input_path}")
     if len(in_paths) == 0:
         print(f"no files found in {input_path}")
         exit(1)
@@ -123,6 +125,8 @@ def main(argv):
 
         if verbose:
             print(f"detected {len(detections)} vehicles")
+
+        if args.visualize:
             vis_path = output_dir.joinpath(in_path.name).with_suffix(".vis.jpg")
             save_vis(img, detections, vis_path, nn_vehicles.class_colors)
 
@@ -130,7 +134,7 @@ def main(argv):
         save_detections_as_json(output_dir.joinpath("lp", in_path.name).with_suffix(".json"),
                                 detections_lp)
 
-        if verbose:
+        if args.visualize:
             vis_path = output_dir.joinpath(in_path.name).with_suffix(f".vis_lp.jpg")
             lst_lp_detections = sum(detections_lp.values(), [])
             save_vis(img, lst_lp_detections, vis_path, nn_lp.class_colors)

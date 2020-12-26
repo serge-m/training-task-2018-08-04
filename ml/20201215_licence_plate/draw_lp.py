@@ -42,7 +42,6 @@ def load_detections_from_json(path):
 
 def main(argv):
     args = parse_args(argv)
-    verbose = args.verbose
     input_path = Path(args.input_dir)
     in_paths = sorted([p for p in input_path.glob("*.jpg") if p.is_file()])
     print(in_paths)
@@ -54,23 +53,22 @@ def main(argv):
     classes = Path("./data/coco.names").open().read().splitlines()
     classes_lp = Path("./data/obj.names").open().read().splitlines()
 
-
     for in_path in in_paths:
         img = imread(str(in_path))
 
         detections = load_detections_from_json(output_dir.joinpath("vehicles", in_path.name).with_suffix(".json"))
 
-        if verbose:
-            print(f"detected {len(detections)} vehicles")
-            vis_path = output_dir.joinpath(in_path.name).with_suffix(".vis.jpg")
-            save_vis(img, detections, vis_path, class_colors(classes))
+        vis_path = output_dir.joinpath(in_path.name).with_suffix(".vis.jpg")
+        save_vis(img, detections, vis_path, class_colors(classes))
 
         detections_lp = load_detections_from_json(output_dir.joinpath("lp", in_path.name).with_suffix(".json"))
 
-        if verbose:
-            vis_path = output_dir.joinpath(in_path.name).with_suffix(f".vis_lp.jpg")
-            lst_lp_detections = sum(detections_lp.values(), [])
-            save_vis(img, lst_lp_detections, vis_path, class_colors(classes_lp))
+        vis_path = output_dir.joinpath(in_path.name).with_suffix(f".vis_lp.jpg")
+        lst_lp_detections = sum(detections_lp.values(), [])
+        save_vis(img, lst_lp_detections, vis_path, class_colors(classes_lp))
+
+        if args.verbose:
+            print(f"detected {len(detections)} vehicles and {len(lst_lp_detections)} licence plates")
 
 
 if __name__ == '__main__':
