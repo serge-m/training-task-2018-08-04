@@ -1,10 +1,12 @@
 import argparse
 import json
 import sys
+from multiprocessing import Pool
 from pathlib import Path
 
 from simplebbox.array import cxcywh_to_x0y0x1y1_trunc_int
 from skimage.io import imread, imsave
+from tqdm import tqdm
 
 from darknet_facade import class_colors
 
@@ -53,22 +55,36 @@ def main(argv):
     classes = Path("./data/coco.names").open().read().splitlines()
     classes_lp = Path("./data/obj.names").open().read().splitlines()
 
-    for in_path in in_paths:
-        img = imread(str(in_path))
+    tasks = (
+        (in_path, output_dir, classes, classes_lp, args.verbose)
+        for in_path in in_paths
+    )
+    with Pool(4) as pool:
+        for _ in tqdm(pool.imap(process_unpack, tasks, chunksize=5)):
+            pass
+        pool.close()
 
-        detections = load_detections_from_json(output_dir.joinpath("vehicles", in_path.name).with_suffix(".json"))
 
-        vis_path = output_dir.joinpath(in_path.name).with_suffix(".vis.jpg")
-        save_vis(img, detections, vis_path, class_colors(classes))
+def process_unpack(args):
+    return process(*args)
 
-        detections_lp = load_detections_from_json(output_dir.joinpath("lp", in_path.name).with_suffix(".json"))
 
-        vis_path = output_dir.joinpath(in_path.name).with_suffix(f".vis_lp.jpg")
-        lst_lp_detections = sum(detections_lp.values(), [])
-        save_vis(img, lst_lp_detections, vis_path, class_colors(classes_lp))
+def process(in_path, output_dir, classes, classes_lp, verbose):
+    img = imread(str(in_path))
 
-        if args.verbose:
-            print(f"detected {len(detections)} vehicles and {len(lst_lp_detections)} licence plates")
+    detections = load_detections_from_json(output_dir.joinpath("vehicles", in_path.name).with_suffix(".json"))
+
+    vis_path = output_dir.joinpath(in_path.name).with_suffix(".vis.jpg")
+    save_vis(img, detections, vis_path, class_colors(classes))
+
+    detections_lp = load_detections_from_json(output_dir.joinpath("lp", in_path.name).with_suffix(".json"))
+
+    vis_path = output_dir.joinpath(in_path.name).with_suffix(f".vis_lp.jpg")
+    lst_lp_detections = sum(detections_lp.values(), [])
+    save_vis(img, lst_lp_detections, vis_path, class_colors(classes_lp))
+
+    if verbose:
+        print(f"detected {len(detections)} vehicles and {len(lst_lp_detections)} licence plates")
 
 
 if __name__ == '__main__':
