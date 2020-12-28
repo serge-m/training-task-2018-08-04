@@ -64,8 +64,7 @@ class SegmentTree:
 
 
 def test1():
-    nums = list(map(int, "5 1 1 1 1 5 1 1 1 1 0".split(' ')))
-    assert Solution().jump(nums) == 2
+    assert Solution().jump([5, 1, 1, 1, 1, 5, 1, 1, 1, 1, 0]) == 2
 
 
 def test2():
