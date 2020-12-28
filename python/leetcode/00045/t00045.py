@@ -17,3 +17,8 @@ class Solution:
                     return jumps[n - 1]
 
         return jumps[n - 1]
+
+
+def test1():
+    nums = list(map(int, "5 1 1 1 1 5 1 1 1 1 0".split(' ')))
+    assert Solution().jump(nums) == 2
