@@ -12,10 +12,10 @@ function X = Nonlinear_Triangulation(K, C1, R1, C2, R2, C3, R3, x1, x2, x3, X0)
 N = size(x1, 1);
 X = [];
 for i=1:N
-    Xi = Single_Point_Nonlinear_Triangulation(K, C1, R1, C2, R2, C3, R3, x1(i, :), x2(i, :), x3(i, :), X0(i, :));
+    Xi = Single_Point_Nonlinear_Triangulation(K, C1, R1, C2, R2, C3, R3, x1(i, :)', x2(i, :)', x3(i, :)', X0(i, :)');
     X = [X; Xi'];
 end
-
+size(X)
 end
 
 
@@ -23,16 +23,15 @@ end
 function X = Single_Point_Nonlinear_Triangulation(K, C1, R1, C2, R2, C3, R3, x1, x2, x3, X0)
 X_cur = X0;
 while 1
-    b = [x1 x2 x3]';
+    b = [x1; x2; x3];
     uvw1 = K * R1 * (X_cur - C1);
     uvw2 = K * R2 * (X_cur - C2);
     uvw3 = K * R3 * (X_cur - C3);
-    fX = [uvw1(1:2) ./ uvw1(3)  uvw2(1:2) ./ uvw2(3)  uvw3(1:2) ./ uvw3(3)]';
-    J = [
-        Jacobian_Triangulation(C1, R1, K, X_cur);
-        Jacobian_Triangulation(C2, R2, K, X_cur);
-        Jacobian_Triangulation(C3, R3, K, X_cur)
-        ];
+    fX = [uvw1(1:2) ./ uvw1(3);  uvw2(1:2) ./ uvw2(3); uvw3(1:2) ./ uvw3(3)];
+    j1 = Jacobian_Triangulation(C1, R1, K, X_cur);
+    j2 = Jacobian_Triangulation(C2, R2, K, X_cur);
+    j3 = Jacobian_Triangulation(C3, R3, K, X_cur);
+    J = [j1' j2' j3']';
         
     delta_X = inv(J' * J) * J' * (b - fX);
 %     if norm(delta_X) < 1e-3
