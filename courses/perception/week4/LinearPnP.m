@@ -27,8 +27,8 @@ for i=1:N
     Xi = X(i, :);
     %uvi = Kinv_x(:, i);
     uvi = xh(i, :);
-    Ai = skew(Kinv * uvi') * [Xi zero_1x4 zero_1x4;
-        zero_1x4 Xi zero_1x4;
+    Ai = skew(Kinv * uvi') * [Xi zero_1x4 zero_1x4; 
+        zero_1x4 Xi zero_1x4; 
         zero_1x4 zero_1x4 Xi];
     A = [A; Ai];
 end
@@ -40,7 +40,7 @@ P = reshape(sol, 4, 3)';
 R_raw = P(:, 1:3);
 [ru, rs, rv] = svd(R_raw);
 
-t = P(:, 4)
+t = P(:, 4)  / rs(1,1);
 R = ru * rv';
 
 if det(R) < 0
