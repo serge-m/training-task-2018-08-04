@@ -82,6 +82,20 @@ class QSortHoarePivotMid(QSortHoare):
         return a[(lo + hi) // 2]
 
 
+class QSortHoarePivotMidSwapLow(QSortHoare):
+    # noinspection PyMethodMayBeStatic
+    def pivot(self, a, lo, hi):
+        self.swap(a, lo, (lo + hi) // 2)
+        return a[lo]
+
+
+class QSortHoarePivotHiSwapLow(QSortHoare):
+    # noinspection PyMethodMayBeStatic
+    def pivot(self, a, lo, hi):
+        self.swap(a, lo, hi)
+        return a[lo]
+
+
 def run_counting(sort_cls, arr, sorted_validation=None):
     swap_cnt = CallCount(swap)
     predicate_cnt = CallCount(lambda x, y: x < y)
@@ -125,7 +139,7 @@ def test_hoare():
         [10, 10, 10, 11, 11, 12, 13],
         list(range(100, 109)),
     ]
-    for sort_cls in [QSortHoarePivotLow, QSortHoarePivotMid]:
+    for sort_cls in [QSortHoarePivotLow, QSortHoarePivotMid, QSortHoarePivotMidSwapLow, QSortHoarePivotHiSwapLow]:
         print(sort_cls.__name__)
         for arr in arrays:
             swapstat = MinMaxStat()
@@ -152,3 +166,7 @@ def test_hoare_low_many_comparisons():
 def test_hoare_high_failing():
     with pytest.raises(RecursionError):
         run_counting(QSortHoarePivotHigh, [0, 1])
+
+def test_hoare_high_failing2():
+    with pytest.raises(RecursionError):
+        run_counting(QSortHoarePivotHigh, [1, 0, 2])

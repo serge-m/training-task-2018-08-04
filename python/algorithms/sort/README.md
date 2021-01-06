@@ -6,9 +6,9 @@ In order to understand how quicksort with Hoare partition behaves I made several
 Pivot is selected either as the low element `pivot = A[lo]` or as a middle element `pivot = A[(lo+hi) // 2]`:
 
 Mid element is considerably faster on average. In the worst case they are the same. Just the worst case for the
+mid element is a bit different.
 
 ### QSortHoarePivotLow
-
     swaps
     min 0 (0, 1)
     max 1 (1, 0)
@@ -42,9 +42,8 @@ Mid element is considerably faster on average. In the worst case they are the sa
     max 60 (101, 102, 103, 104, 105, 106, 107, 108, 100)
     avg 47.5182208994709
 
-
 ### QSortHoarePivotMid
-    
+
     swaps
     min 0 (0, 1)
     max 1 (1, 0)
@@ -77,3 +76,74 @@ Mid element is considerably faster on average. In the worst case they are the sa
     min 37 (100, 101, 102, 103, 104, 105, 106, 107, 108)
     max 60 (101, 102, 103, 105, 100, 108, 104, 106, 107)
     avg 44.66779100529101
+
+### QSortHoarePivotMidSwapLow
+
+    swaps
+    min 1 (0, 1)
+    max 2 (1, 0)
+    avg 1.5
+    cmp
+    min 3 (0, 1)
+    max 4 (1, 0)
+    avg 3.5
+    swaps
+    min 2 (1, 0, 2)
+    max 4 (0, 2, 1)
+    avg 3.1666666666666665
+    cmp
+    min 7 (1, 0, 2)
+    max 9 (0, 2, 1)
+    avg 8.166666666666666
+    swaps
+    min 9 (11, 10, 10, 11, 12, 10, 13)
+    max 15 (10, 11, 13, 11, 12, 10, 10)
+    avg 12.192857142857143
+    cmp
+    min 27 (11, 10, 10, 11, 12, 10, 13)
+    max 38 (10, 10, 12, 13, 11, 10, 11)
+    avg 31.745238095238093
+    swaps
+    min 8 (101, 105, 103, 107, 100, 102, 104, 106, 108)
+    max 21 (101, 105, 106, 108, 104, 100, 107, 102, 103)
+    avg 15.307098765432098
+    cmp
+    min 40 (100, 102, 105, 103, 104, 107, 106, 101, 108)
+    max 60 (100, 101, 105, 107, 108, 103, 104, 102, 106)
+    avg 47.535493827160494
+
+### QSortHoarePivotHiSwapLow
+
+    swaps
+    min 1 (1, 0)
+    max 2 (0, 1)
+    avg 1.5
+    cmp
+    min 3 (1, 0)
+    max 4 (0, 1)
+    avg 3.5
+    swaps
+    min 2 (1, 2, 0)
+    max 4 (0, 1, 2)
+    avg 3.1666666666666665
+    cmp
+    min 7 (1, 2, 0)
+    max 9 (0, 1, 2)
+    avg 8.166666666666666
+    swaps
+    min 9 (10, 10, 11, 11, 12, 13, 10)
+    max 14 (10, 11, 12, 10, 10, 11, 13)
+    avg 11.773809523809524
+    cmp
+    min 28 (10, 10, 12, 10, 11, 13, 11)
+    max 37 (10, 10, 10, 11, 11, 12, 13)
+    avg 31.604761904761904
+    swaps
+    min 8 (101, 102, 103, 104, 105, 106, 107, 108, 100)
+    max 20 (106, 105, 108, 107, 101, 100, 103, 102, 104)
+    avg 14.524118165784833
+    cmp
+    min 40 (101, 100, 103, 104, 102, 106, 107, 108, 105)
+    max 60 (100, 101, 102, 103, 104, 105, 106, 107, 108)
+    avg 47.00933090828924
+
