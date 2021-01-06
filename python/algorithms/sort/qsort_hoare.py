@@ -159,13 +159,20 @@ def test_worst_case_hoare_low():
     run_counting(QSortHoarePivotLow, [13, 10, 10, 10, 11, 11, 12])
 
 
-def test_hoare_low_many_comparisons():
-    run_counting(QSortHoarePivotLow, (100, 101, 102, 103, 104, 105, 106, 107, 108))
+def test_hoare_low__many_comparisons_sorted():
+    res = run_counting(QSortHoarePivotLow, (100, 101, 102, 103, 104, 105, 106, 107, 108))
+    print(res)
+
+
+def test_hoare_low__worst_case__almost_sorted():
+    res = run_counting(QSortHoarePivotLow, (101, 102, 103, 104, 105, 106, 107, 108, 100))
+    print(res)
 
 
 def test_hoare_high_failing():
     with pytest.raises(RecursionError):
         run_counting(QSortHoarePivotHigh, [0, 1])
+
 
 def test_hoare_high_failing2():
     with pytest.raises(RecursionError):
