@@ -147,3 +147,15 @@ mid element is a bit different.
     max 60 (100, 101, 102, 103, 104, 105, 106, 107, 108)
     avg 47.00933090828924
 
+
+
+# References
+
+* Wiki https://en.wikipedia.org/wiki/Quicksort
+* about pivot choice:
+  * https://cs.stackexchange.com/questions/97727/hoare-partitioning-scheme-in-quicksort
+* explanation about lomuto vs hoare schemes on reddit: [hoares_partition_scheme_fails_for_this_input](https://www.reddit.com/r/AskProgramming/comments/6emoyb/hoares_partition_scheme_fails_for_this_input/dicihap?utm_source=share&utm_medium=web2x&context=3)
+* about many things in qsort: [combsortcs2p-and-other-sorting-algorithms](https://code.google.com/archive/p/combsortcs2p-and-other-sorting-algorithms/wikis/QuickSort.wiki)
+  (including a note about tail recursion).
+
+
