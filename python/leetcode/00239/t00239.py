@@ -16,7 +16,7 @@ class Solution:
         n = len(nums)
 
         def get_max():
-            return max(nums[window_idxs[0]], nums[start])
+            return nums[window_idxs[0]]
 
         def remove_prev_start():
             if window_idxs and start - 1 == window_idxs[0]:
@@ -36,7 +36,6 @@ class Solution:
                 result.append(get_max())
 
         return result
-
 
 """
 [1,3,-1,-3,5,3,6,7]
