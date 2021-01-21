@@ -19,7 +19,7 @@ class Solution:
             return nums[window_idxs[0]]
 
         def remove_prev_start():
-            if window_idxs and start - 1 == window_idxs[0]:
+            if window_idxs and prev_start == window_idxs[0]:
                 window_idxs.popleft()
 
         def add_end():
@@ -29,10 +29,10 @@ class Solution:
 
         result = []
         for end in range(n):
-            start = end - k + 1
+            prev_start = end - k
             remove_prev_start()
             add_end()
-            if start >= 0:
+            if prev_start >= -1:
                 result.append(get_max())
 
         return result
