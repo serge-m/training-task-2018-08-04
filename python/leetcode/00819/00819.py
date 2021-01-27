@@ -13,7 +13,6 @@ class Solution:
         counter = defaultdict(int)
         banned = set(banned)
         for word in split(paragraph):
-            word = word.strip()
             word = word.lower()
             if word in banned:
                 continue
