@@ -72,9 +72,6 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
 
     end
 
-
-    
-    %score = (score - min_map) / (max_map - min_map);
     %   2-2) For each particle, calculate the correlation scores of the particles
 
     %   2-3) Update the particle weights
@@ -85,9 +82,6 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
 
     [m_val, m_idx] = max(weights_new);
     myPose(:,j) = P_propagated(:, m_idx);
-    %disp(sprintf("J %d m_val %f m_idx %f", j, m_val, m_idx))
-    %disp(score(1,1))
-    %disp(score(1,m_idx))
 
     effective_n = 1.0/sum(weights_new.^2);
     j
@@ -119,7 +113,7 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
     % 4) Visualize the pose on the map as needed
 
     % The final grid map:
-    if j > 20 && mod(j, 10) == 0
+    if j > 10 && mod(j, 20) == 0
         if exist('f1','var')
             close(f1)
         end
