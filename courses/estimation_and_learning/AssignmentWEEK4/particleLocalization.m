@@ -34,19 +34,19 @@ M = param.num_partices;
 P = repmat(myPose(:,1), [1, M]);
 P_next = zeros(size(P));
 
-sigmas = [0.1 0.1 0.01]';
+sigmas = [0.1 0.1 0.05]';
 %sigmas = sigmas .* 10;
 weights = ones([1 M]) / M;
 weights_next = zeros(size(weights));
-map2 = map;
-map2(map2<1) = 0;
-map2(map2>=1) = 1;
-map_blur = imgaussfilt(map2,2);
+%map2 = map;
+%map2(map2<1) = 0;
+%map2(map2>=1) = 1;
+%map_blur = imgaussfilt(map2,2);
 
-min_map = min(map(:));
-max_map = max(map(:));
+%min_map = min(map(:));
+%max_map = max(map(:));
+v = [0; 0];
 for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
-
     % 1) Propagate the particles
     P_propagated = P + randn(size(P)) .* sigmas;
     % for debugging
@@ -66,13 +66,25 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
         hitx = ceil((ranges(:,j).*cos(scanAngles + p1(3)) + p1(1))*param.resol + param.origin(1));
         hity = ceil((-ranges(:,j).*sin(scanAngles + p1(3)) + p1(2))*param.resol + param.origin(2));
 
+        %hitx = hitx(1:5:end);
+        %hity = hity(1:5:end);
         in_range = 0 <= hitx & hitx <= size(map, 2) & 0 <= hity & hity <= size(map, 1);
         hitx = hitx(in_range);
         hity = hity(in_range);
 
         hit = map(hity, hitx);
         %score(p_id) = mean(hit(:));
-        score(p_id) = (sum(hit>1,[1,2])) / size(ranges, 1);
+        map_free = map;
+        score_free = 0;
+        for hi=1:10:size(hitx, 1)
+            [freex, freey] = bresenham(p_on_map(1),p_on_map(2),hitx(hi),hity(hi));
+
+            %free = sub2ind(size(myMap),freey,freex);
+            score_free = score_free + sum(map_free(ceil(freey), ceil(freex)) > 1, [1,2]);
+        end
+
+        score_occ = sum(hit>1,[1,2]) - sum(hit<0,[1,2])*0.1;
+        score(p_id) = (score_occ - score_free) / size(ranges, 1);
 
         %hit = map_blur(hity, hitx);
         %score(p_id) = sum(hit(:)) / size(ranges, 1);
@@ -83,8 +95,9 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
     %   2-2) For each particle, calculate the correlation scores of the particles
     %score = score / sum(score(:));
     %   2-3) Update the particle weights
+    score = score - min(score(:));
     weights_new = weights .* score;
-    weights_new = weights_new - min(weights_new(:));
+    %weights_new = weights_new - min(weights_new(:));
     weights_new = weights_new / sum(weights_new(:));
     weights_new_c = cumsum(weights_new);
 
@@ -120,7 +133,7 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
             close(f1)
         end
         f1 = figure;
-        imagesc(map_blur); hold on;
+        imagesc(map); hold on;
         colormap('gray');
         axis equal;
     %     hold on;
@@ -137,8 +150,8 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
 %         plot(hitx,hity, 'r.');
 
 
-        plot(P(1, 1:10:end)*param.resol+param.origin(1), ...
-             P(2, 1:10:end)*param.resol+param.origin(2), 'g.');
+        plot(P_propagated(1, 1:1:end)*param.resol+param.origin(1), ...
+             P_propagated(2, 1:1:end)*param.resol+param.origin(2), 'g.');
 
 
         plot(myPose(1,1)*param.resol+param.origin(1), ...
