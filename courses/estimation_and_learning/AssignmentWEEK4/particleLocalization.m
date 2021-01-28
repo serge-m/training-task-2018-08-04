@@ -28,13 +28,14 @@ myPose(:,1) = param.init_pose;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %M =                            % Please decide a reasonable number of M,
                                % based on your experiment using the practice data.
-M = param.num_partices;
+%M = param.num_partices;
+M = 100;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Create M number of particles
 P = repmat(myPose(:,1), [1, M]);
 P_next = zeros(size(P));
 
-sigmas = [0.1 0.1 0.05]';
+sigmas = [0.2 0.2 0.01]';
 %sigmas = sigmas .* 10;
 weights = ones([1 M]) / M;
 weights_next = zeros(size(weights));
@@ -46,6 +47,10 @@ weights_next = zeros(size(weights));
 %min_map = min(map(:));
 %max_map = max(map(:));
 v = [0; 0];
+score = zeros([1 M]);
+score_good = zeros([1 M]);
+
+
 for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
     % 1) Propagate the particles
     P_propagated = P + randn(size(P)) .* sigmas;
@@ -54,13 +59,13 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
 
     % 2) Measurement Update
     %   2-1) Find grid cells hit by the rays (in the grid map coordinate frame)
-    score = zeros([1 M]);
+    score_good(:) = 1;
     for p_id=1:M
         p1 = P_propagated(:, p_id);
         p_on_map = [p1(1)*param.resol + param.origin(1); p1(2)*param.resol + param.origin(2)];
         p_on_map  = ceil(p_on_map );
-        if map(p_on_map(2), p_on_map(1)) > 1
-            score(p_id) = 0;
+        if map(p_on_map(2), p_on_map(1)) > 0
+            score_good(p_id) = 0;
             continue;
         end
         hitx = ceil((ranges(:,j).*cos(scanAngles + p1(3)) + p1(1))*param.resol + param.origin(1));
@@ -68,7 +73,7 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
 
         %hitx = hitx(1:5:end);
         %hity = hity(1:5:end);
-        in_range = 0 <= hitx & hitx <= size(map, 2) & 0 <= hity & hity <= size(map, 1);
+        in_range = 1 <= hitx & hitx <= size(map, 2) & 1 <= hity & hity <= size(map, 1);
         hitx = hitx(in_range);
         hity = hity(in_range);
 
@@ -76,34 +81,41 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
         %score(p_id) = mean(hit(:));
         map_free = map;
         score_free = 0;
-        for hi=1:10:size(hitx, 1)
+        step_check_free = 10;
+        for hi=1:step_check_free:size(hitx, 1)
             [freex, freey] = bresenham(p_on_map(1),p_on_map(2),hitx(hi),hity(hi));
 
             %free = sub2ind(size(myMap),freey,freex);
-            score_free = score_free + sum(map_free(ceil(freey), ceil(freex)) > 1, [1,2]);
+            map_vals = map_free(ceil(freey), ceil(freex));
+            score_free = score_free + 1 * sum(map_vals < 0, [1,2]) - 5 * sum(map_vals > 1, [1,2]);
         end
+        score_free = score_free * step_check_free / 20;
 
-        score_occ = sum(hit>1,[1,2]) - sum(hit<0,[1,2])*0.1;
-        score(p_id) = (score_occ - score_free) / size(ranges, 1);
-
-        %hit = map_blur(hity, hitx);
-        %score(p_id) = sum(hit(:)) / size(ranges, 1);
+        score_occ = sum(hit>1,[1,2]) * 10 - sum(hit<0,[1,2]) * 5;
+        score(p_id) = (score_occ + score_free) / size(ranges, 1);
 
     end
 
     %score = (score - min_map) / (max_map - min_map);
     %   2-2) For each particle, calculate the correlation scores of the particles
-    %score = score / sum(score(:));
+
     %   2-3) Update the particle weights
     score = score - min(score(:));
+    score(score_good==0) = 0;
     weights_new = weights .* score;
     %weights_new = weights_new - min(weights_new(:));
     weights_new = weights_new / sum(weights_new(:));
+
+    [m_val, m_idx] = max(weights_new);
+    myPose(:,j) = P_propagated(:, m_idx);
+    %disp(sprintf("J %d m_val %f m_idx %f", j, m_val, m_idx))
+    %disp(score(1,1))
+    %disp(score(1,m_idx))
+
     weights_new_c = cumsum(weights_new);
 
     shift = ((1:M) -1) .* (1/M);
     probe = rand() * (1/M) + shift;
-    c = weights_new_c(1);
     p_id = 1;
     for probe_id=1:M
         while probe(probe_id) > weights_new_c(p_id)
@@ -113,12 +125,10 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
         weights_next(:, probe_id) = weights_new(:, p_id);
     end
 
-
     P = P_next;
     weights = weights_next;
 
-    [m_val, m_idx] = max(weights);
-    myPose(:,j) = P(:, m_idx);
+
     %   2-4) Choose the best particle to update the pose
 
 
@@ -128,7 +138,7 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
     % 4) Visualize the pose on the map as needed
 
     % The final grid map:
-    if mod(j, 10) == 0
+    if mod(j, 5) == 0
         if exist('f1','var')
             close(f1)
         end
