@@ -34,7 +34,7 @@ M = param.num_partices;
 P = repmat(myPose(:,1), [1, M]);
 P_next = zeros(size(P));
 
-sigmas = [0.1 0.1 0.1]';
+sigmas = [0.2 0.2 0.1]';
 %sigmas = sigmas .* 10;
 weights = ones([1 M]) / M;
 weights_next = zeros(size(weights));
@@ -108,7 +108,7 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
     % 4) Visualize the pose on the map as needed
 
     % The final grid map:
-    if mod(j, 10) == 0
+    if mod(j, 5) == 0
         if exist('f1','var')
             close(f1)
         end
@@ -124,10 +124,10 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
         hity = (-ranges(:,idx_to_plot).*sin(scanAngles + pose_to_plot(3)) + pose_to_plot(2))*param.resol + param.origin(2);
         plot(hitx,hity, 'b.');
 
-        pose_to_plot = P_propagated(:, 1);
-        hitx = (ranges(:,1).*cos(scanAngles + pose_to_plot(3)) + pose_to_plot(1))*param.resol + param.origin(1);
-        hity = (-ranges(:,1).*sin(scanAngles + pose_to_plot(3)) + pose_to_plot(2))*param.resol + param.origin(2);
-        plot(hitx,hity, 'r.');
+%         pose_to_plot = P_propagated(:, 1);
+%         hitx = (ranges(:,1).*cos(scanAngles + pose_to_plot(3)) + pose_to_plot(1))*param.resol + param.origin(1);
+%         hity = (-ranges(:,1).*sin(scanAngles + pose_to_plot(3)) + pose_to_plot(2))*param.resol + param.origin(2);
+%         plot(hitx,hity, 'r.');
 
 
         plot(P(1, 1:10:end)*param.resol+param.origin(1), ...
@@ -141,7 +141,7 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
         plot(myPose(1,j)*param.resol+param.origin(1), ...
             myPose(2,j)*param.resol+param.origin(2), 'rx');
 
-
+        saveas(f1,sprintf("vis_%05d.jpg", j));
     end
 
 
