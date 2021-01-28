@@ -34,10 +34,15 @@ M = param.num_partices;
 P = repmat(myPose(:,1), [1, M]);
 P_next = zeros(size(P));
 
-sigmas = [0.2 0.2 0.1]';
+sigmas = [0.1 0.1 0.01]';
 %sigmas = sigmas .* 10;
 weights = ones([1 M]) / M;
 weights_next = zeros(size(weights));
+map2 = map;
+map2(map2<1) = 0;
+map2(map2>=1) = 1;
+map_blur = imgaussfilt(map2,2);
+
 min_map = min(map(:));
 max_map = max(map(:));
 for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
@@ -66,9 +71,11 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
         hity = hity(in_range);
 
         hit = map(hity, hitx);
-
         %score(p_id) = mean(hit(:));
         score(p_id) = (sum(hit>1,[1,2])) / size(ranges, 1);
+
+        %hit = map_blur(hity, hitx);
+        %score(p_id) = sum(hit(:)) / size(ranges, 1);
 
     end
 
@@ -108,12 +115,12 @@ for j = 2:N % You will start estimating myPose from j=2 using ranges(:,2).
     % 4) Visualize the pose on the map as needed
 
     % The final grid map:
-    if mod(j, 5) == 0
+    if mod(j, 10) == 0
         if exist('f1','var')
             close(f1)
         end
         f1 = figure;
-        imagesc(map); hold on;
+        imagesc(map_blur); hold on;
         colormap('gray');
         axis equal;
     %     hold on;
