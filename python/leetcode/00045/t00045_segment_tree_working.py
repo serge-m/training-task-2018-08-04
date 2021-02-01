@@ -3,6 +3,11 @@
 
 Solution with segment tree
 
+References:
+    https://cp-algorithms.com/data_structures/segment_tree.html
+    https://en.wikipedia.org/wiki/Segment_tree
+    https://www.quora.com/How-does-one-decide-when-to-use-a-Segment-Tree-or-Fenwick-Tree
+
 """
 
 from typing import List
