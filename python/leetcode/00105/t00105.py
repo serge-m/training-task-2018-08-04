@@ -17,16 +17,15 @@ class Solution:
         assert len(preorder) == len(inorder)
         pos_inorder = {val: i for i, val in enumerate(inorder)}
 
+
         def construct(start_pre, end_pre, start_in, end_in):
             if start_pre >= end_pre or start_pre >= len(preorder):
                 return None
             root = TreeNode(val=preorder[start_pre])
-            if start_pre + 1 == end_pre:
-                return root
             pos_root_inorder = pos_inorder[root.val]
             len_left = pos_root_inorder - start_in
-            root.left = construct(start_pre + 1, start_pre + len_left + 1, start_in, pos_root_inorder)
-            root.right = construct(start_pre + len_left + 1, end_pre, pos_root_inorder + 1, end_in)
+            root.left = construct(start_pre+1, start_pre+len_left+1, start_in, pos_root_inorder)
+            root.right = construct(start_pre+len_left+1, end_pre, pos_root_inorder+1, end_in)
             return root
 
         return construct(0, len(preorder), 0, len(inorder))
