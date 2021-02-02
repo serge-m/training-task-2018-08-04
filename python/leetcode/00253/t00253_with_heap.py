@@ -11,7 +11,7 @@ import heapq
 
 class Solution:
     def minMeetingRooms(self, intervals: List[List[int]]) -> int:
-        intervals.sort()
+        intervals.sort(key=lambda interval: interval[0])
         max_size = 0
         heap = []
         for start, end in intervals:
@@ -20,7 +20,6 @@ class Solution:
             heapq.heappush(heap, end)
             max_size = max(max_size, len(heap))
         return max_size
-
 
 """
 0 30
@@ -45,6 +44,7 @@ maxsize = 2
 
 """
 
+
 """
 0 0
 30 1
@@ -66,3 +66,4 @@ maxsize = 2
 
 
 """
+
