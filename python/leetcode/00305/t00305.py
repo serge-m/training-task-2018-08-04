@@ -9,11 +9,13 @@ from typing import List
 class DS:
     def __init__(self):
         self.p = {}
+        self.r = {}
 
     def add(self, x):
         if x in self.p:
             return
         self.p[x] = x
+        self.r[x] = 1
 
     def find(self, x):
         while x != self.p[x]:
@@ -25,6 +27,10 @@ class DS:
         y = self.find(y)
         if x == y:
             return 0
+        if self.r[x] > self.r[y]:
+            x, y = y, x
+        elif self.r[x] == self.r[y]:
+            self.r[y] += 1
         self.p[x] = y
         return -1
 
