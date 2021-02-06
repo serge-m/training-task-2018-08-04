@@ -21,16 +21,16 @@ class Solution:
             return 0
 
         left = 0
-        right = 2 ** (max_depth - 1) - 1
+        right = 2 ** (max_depth - 1)
 
-        while right >= left:
+        while right > left:
             mid = (left + right) // 2
-            d = probe_depth(root, 0, 2 ** (max_depth - 1) - 1, mid)
+            d = probe_depth(root, 0, 2**(max_depth-1), mid)
             # print(left, right, mid, d)
             if d == max_depth:
                 left = mid + 1
             else:
-                right = mid - 1
+                right = mid
         return 2 ** (max_depth - 1) - 1 + int(left)
 
 
@@ -46,16 +46,16 @@ def probe_depth(node, start, end, leaf_id):
     # print("probe ", node.val if node else node, start, end, leaf_id)
     if node is None:
         return 0
-    if start == end:
+    if start + 1 == end:
         if leaf_id == 0:
             return 1
         else:
             return 0
-    mid = (start + end) // 2
-    if leaf_id <= mid:
+    mid = (start+end) // 2
+    if leaf_id < mid:
         return probe_depth(node.left, start, mid, leaf_id) + 1
     else:
-        return probe_depth(node.right, 0, end - (mid + 1), leaf_id - (mid + 1)) + 1
+        return probe_depth(node.right, 0, end - mid, leaf_id - mid) + 1
 
 
 tree7 = TreeNode(1,
