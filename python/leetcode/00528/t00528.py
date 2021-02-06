@@ -9,9 +9,25 @@ w[i] > 0
 import random
 import itertools
 from typing import List
+import bisect
 
 
-class Solution:
+class Solution:  # binsearch
+
+    def __init__(self, w: List[int]):
+        self.random = random.Random(0)
+        self.w = w
+        self.sum = sum(w)
+        self.csum = list(itertools.accumulate(w))
+        self.m = len(w)
+
+    def pickIndex(self) -> int:
+        pos = self.random.random() * self.sum
+        idx = bisect.bisect_left(self.csum, pos)
+        return idx
+
+
+class SolutionSmart:
 
     def __init__(self, w: List[int]):
         self.random = random.Random(0)
