@@ -23,22 +23,17 @@ class Solution:
         left = 0
         right = 2 ** (max_depth - 1) - 1
 
-        while right > left:
+        while right - left > 1:
             mid = (left + right) // 2
             d = probe_depth(root, max_depth, mid)
             # print(left, right, mid, d)
             if d == max_depth:
-                if left == mid:
-                    print("asdasd")
-                    break
                 left = mid
-
             else:
                 right = mid
         if probe_depth(root, max_depth, right) == max_depth:
-            return 2 ** (max_depth - 1) - 1 + right + 1
-        else:
-            return 2 ** (max_depth - 1) - 1 + left + 1
+            left = right
+        return 2 ** (max_depth - 1) - 1 + left + 1
 
 
 def get_depth(node):
