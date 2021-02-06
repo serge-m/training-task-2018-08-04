@@ -23,17 +23,15 @@ class Solution:
         left = 0
         right = 2 ** (max_depth - 1) - 1
 
-        while right - left > 1:
+        while right >= left:
             mid = (left + right) // 2
-            d = probe_depth(root, max_depth, mid)
+            d = probe_depth(root, 0, 2 ** (max_depth - 1) - 1, mid)
             # print(left, right, mid, d)
             if d == max_depth:
-                left = mid
+                left = mid + 1
             else:
-                right = mid
-        if probe_depth(root, max_depth, right) == max_depth:
-            left = right
-        return 2 ** (max_depth - 1) - 1 + left + 1
+                right = mid - 1
+        return 2 ** (max_depth - 1) - 1 + int(left)
 
 
 def get_depth(node):
@@ -44,16 +42,20 @@ def get_depth(node):
     return depth
 
 
-def probe_depth(node, depth, child_id):
+def probe_depth(node, start, end, leaf_id):
+    # print("probe ", node.val if node else node, start, end, leaf_id)
     if node is None:
         return 0
-    if depth == 1:
-        return 1
-    cnt_in_left = 2 ** (depth - 2)
-    if child_id < cnt_in_left:
-        return probe_depth(node.left, depth - 1, child_id) + 1
+    if start == end:
+        if leaf_id == 0:
+            return 1
+        else:
+            return 0
+    mid = (start + end) // 2
+    if leaf_id <= mid:
+        return probe_depth(node.left, start, mid, leaf_id) + 1
     else:
-        return probe_depth(node.right, depth - 1, child_id - cnt_in_left) + 1
+        return probe_depth(node.right, 0, end - (mid + 1), leaf_id - (mid + 1)) + 1
 
 
 tree7 = TreeNode(1,
@@ -89,22 +91,6 @@ def test_get_depth():
     assert get_depth(tree3) == 2
 
 
-def test_probe_depth():
-    assert probe_depth(None, 1, 0) == 0
-    assert probe_depth(tree1, 1, 0) == 1
-
-    assert probe_depth(tree2, 2, 0) == 2
-    assert probe_depth(tree2, 2, 1) == 1
-
-    assert probe_depth(tree3, 2, 0) == 2
-    assert probe_depth(tree3, 2, 1) == 2
-
-    assert probe_depth(tree6, 3, 0) == 3
-    assert probe_depth(tree6, 3, 1) == 3
-    assert probe_depth(tree6, 3, 2) == 3
-    assert probe_depth(tree6, 3, 3) == 2
-
-
 def test_count_nodes():
     sol = Solution()
     assert sol.countNodes(tree1) == 1
@@ -112,9 +98,3 @@ def test_count_nodes():
     assert sol.countNodes(tree3) == 3
     assert sol.countNodes(tree6) == 6
     assert sol.countNodes(tree7) == 7
-
-
-def test1():
-    for i in range(-100, 100):
-        for j in range(-100, 100):
-            assert i + (j-i)//2 == (i+j)//2

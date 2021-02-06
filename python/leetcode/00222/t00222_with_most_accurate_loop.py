@@ -23,17 +23,15 @@ class Solution:
         left = 0
         right = 2 ** (max_depth - 1) - 1
 
-        while right - left > 1:
+        while right >= left:
             mid = (left + right) // 2
             d = probe_depth(root, max_depth, mid)
             # print(left, right, mid, d)
             if d == max_depth:
-                left = mid
+                left = mid + 1
             else:
-                right = mid
-        if probe_depth(root, max_depth, right) == max_depth:
-            left = right
-        return 2 ** (max_depth - 1) - 1 + left + 1
+                right = mid - 1
+        return 2 ** (max_depth - 1) - 1 + int(left)
 
 
 def get_depth(node):
@@ -112,9 +110,3 @@ def test_count_nodes():
     assert sol.countNodes(tree3) == 3
     assert sol.countNodes(tree6) == 6
     assert sol.countNodes(tree7) == 7
-
-
-def test1():
-    for i in range(-100, 100):
-        for j in range(-100, 100):
-            assert i + (j-i)//2 == (i+j)//2
