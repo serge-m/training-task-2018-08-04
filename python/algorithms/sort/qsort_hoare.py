@@ -137,7 +137,8 @@ def test_hoare():
         [0, 1],
         [0, 1, 2],
         [10, 10, 10, 11, 11, 12, 13],
-        list(range(100, 109)),
+        [10, ] * 7,
+        # list(range(100, 109)),
     ]
     for sort_cls in [QSortHoarePivotLow, QSortHoarePivotMid, QSortHoarePivotMidSwapLow, QSortHoarePivotHiSwapLow]:
         print(sort_cls.__name__)
@@ -161,6 +162,11 @@ def test_worst_case_hoare_low():
 
 def test_hoare_low__many_comparisons_sorted():
     res = run_counting(QSortHoarePivotLow, (100, 101, 102, 103, 104, 105, 106, 107, 108))
+    print(res)
+
+
+def test_hoare_low__many_comparisons_equal():
+    res = run_counting(QSortHoarePivotLow, [10, ] * 10)
     print(res)
 
 
