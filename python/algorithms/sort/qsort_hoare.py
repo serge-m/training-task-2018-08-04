@@ -64,6 +64,28 @@ class QSortHoare(QSort):
             self.swap(a, i, j)
 
 
+class QSortHoare2PivotLow(QSort):
+    def partition(self, a, lo, hi, pivot):
+        i = lo
+        j = hi
+        while True:
+            while self.predicate(a[i], pivot):
+                i += 1
+
+            while self.predicate(pivot, a[j]):
+                j -= 1
+
+            if i >= j:
+                return j
+
+            self.swap(a, i, j)
+            i += 1
+            j -= 1
+
+    def pivot(self, a, lo, hi):
+        return a[lo]
+
+
 class QSortHoarePivotLow(QSortHoare):
     # noinspection PyMethodMayBeStatic
     def pivot(self, a, lo, hi):
@@ -140,7 +162,7 @@ def test_hoare():
         [10, ] * 7,
         # list(range(100, 109)),
     ]
-    for sort_cls in [QSortHoarePivotLow, QSortHoarePivotMid, QSortHoarePivotMidSwapLow, QSortHoarePivotHiSwapLow]:
+    for sort_cls in [QSortHoarePivotLow, QSortHoarePivotMid, QSortHoarePivotMidSwapLow, QSortHoarePivotHiSwapLow, QSortHoare2PivotLow]:
         print(sort_cls.__name__)
         for arr in arrays:
             swapstat = MinMaxStat()
