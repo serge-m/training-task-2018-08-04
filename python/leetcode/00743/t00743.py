@@ -1,3 +1,13 @@
+"""
+743. Network Delay Time
+Medium
+
+dijkstra with lazy heap
+
+t=14
+d=20201219
+"""
+
 import heapq
 from collections import defaultdict
 import sys
