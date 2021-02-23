@@ -106,6 +106,13 @@ def test_probe_seq():
         probed = sorted(seq)
         assert probed == list(range(array_len))
 
+
+def test_standard_hash():
+    for i in range(1000000):
+        if i != hash(i):
+            print(i, hash(i))
+            break
+
 # Your MyHashMap object will be instantiated and called as such:
 # obj = MyHashMap()
 # obj.put(key,value)
