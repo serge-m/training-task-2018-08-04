@@ -6,7 +6,6 @@ Medium
 
 """
 
-
 class Solution:
     def intervalIntersection(self, firstList: List[List[int]], secondList: List[List[int]]) -> List[List[int]]:
         a, b = firstList, secondList
@@ -20,14 +19,8 @@ class Solution:
 
         def do_step():
             nonlocal ia, ib
-            if ia < na - 1:
-                if ib < nb - 1:
-                    if a[ia + 1] < b[ib + 1]:
-                        ia += 1
-                    else:
-                        ib += 1
-                else:
-                    ia += 1
+            if a[ia][1] < b[ib][1]:
+                ia += 1
             else:
                 ib += 1
 
