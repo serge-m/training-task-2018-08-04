@@ -70,3 +70,7 @@ build/
 cmake-build-debug/
 cmake-build-release/
 build/
+data/
+
+lightning_logs/
+
