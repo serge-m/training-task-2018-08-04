@@ -22,7 +22,7 @@ impl State for Draft {
         self    
     }
 
-    fn content<'a>(&self, content: &'a str) -> &'a str {
+    fn content<'a>(&self, _: &'a str) -> &'a str {
         "<Draft>"
     }
 }
@@ -38,7 +38,7 @@ impl State for PendingReview {
         Box::new(Approved{})
     }
 
-    fn content<'a>(&self, content: &'a str) -> &'a str {
+    fn content<'a>(&self, _: &'a str) -> &'a str {
         "<PendingReview>"
     }
 }
