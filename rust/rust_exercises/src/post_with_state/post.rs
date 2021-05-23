@@ -17,7 +17,7 @@ impl Post {
     }
 
     pub fn content(&self) -> &str {
-        (self.content).as_str()
+        self.state.as_ref().unwrap().content(&self.content)
     }
 
     pub fn add_text(&mut self, text: &str) {
@@ -31,6 +31,8 @@ impl Post {
     }
 
     pub fn approve(&mut self) {
-        self.content.push_str("approved");
+        if let Some(s) = self.state.take() {
+            self.state = Some(s.approve());
+        }
     }
 }
