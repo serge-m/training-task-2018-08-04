@@ -3,16 +3,25 @@ use std::thread::{self, JoinHandle};
 
 struct Worker {
     id: usize,
-    thread: JoinHandle<()>,
+    thread: Option<JoinHandle<()>>,
 }
 
 impl Worker {
-    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
+    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Message>>>) -> Worker {
         let thread = thread::spawn(move || loop {
-            let job = receiver.lock().unwrap().recv().unwrap();
-            println!("Worker {} got a job. executing.", id);
-            job();
+            let message = receiver.lock().unwrap().recv().unwrap();
+            match message {
+                Message::NewJob(job) => {
+                    println!("Worker {} got a job. executing.", id);
+                    job();
+                }
+                Message::Terminate => {
+                    println!("Got terminate signal. Exiting worker {}", id);
+                    break;
+                }
+            }
         });
+        let thread = Some(thread);
         Worker{id, thread}
     }
     
@@ -20,10 +29,15 @@ impl Worker {
 
 pub struct ThreadPool {
     workers: Vec<Worker>,
-    sender: mpsc::Sender<Job>,
+    sender: mpsc::Sender<Message>,
 }
 
 type Job = Box<dyn FnOnce() + Send + 'static>;
+
+enum Message {
+    NewJob(Job),
+    Terminate,
+}
 
 impl ThreadPool {
     /// Create a new ThreadPool.
@@ -51,7 +65,24 @@ impl ThreadPool {
     where
         F: FnOnce() + Send + 'static,
     {
-        let job = Box::new(f);
+        let job = Message::NewJob(Box::new(f));
         self.sender.send(job).unwrap();
     }
 } 
+
+impl Drop for ThreadPool {
+    fn drop(&mut self) {
+        println!("terminating workers...");
+        for _ in &self.workers {
+            self.sender.send(Message::Terminate).unwrap();
+        }
+        println!("Joining on workers");
+        for worker in &mut self.workers {
+            println!("Shutting down worker {}", worker.id);
+            if let Some(thread) = worker.thread.take() {
+                thread.join().unwrap();
+            }
+        }
+        println!("workers terminated");
+    }
+}
